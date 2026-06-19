@@ -70,7 +70,7 @@ export function MoonCursor() {
     <div
       ref={ref}
       aria-hidden
-      className="pointer-events-none fixed left-0 top-0 z-[110] h-3 w-3 rounded-full bg-paper opacity-0 mix-blend-difference transition-opacity duration-300"
+      className="pointer-events-none fixed left-0 top-0 z-cursor h-3 w-3 rounded-full bg-paper opacity-0 mix-blend-difference transition-opacity duration-300 will-change-transform"
     />
   );
 }

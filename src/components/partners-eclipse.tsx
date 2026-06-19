@@ -72,9 +72,10 @@ export function PartnersEclipse() {
 
       {/* O eclipse interativo */}
       <div className="order-1 flex justify-center md:order-2">
-        <svg viewBox="0 0 600 600" className="w-full max-w-[420px]">
+        {/* Decorativo: o estado interativo é transmitido pela lista de botões. */}
+        <svg aria-hidden viewBox="0 0 600 600" className="w-full max-w-[420px]">
           {/* Anel orbital pontilhado */}
-          <g style={{ transformOrigin: "300px 300px" }} className="[animation:orbit_60s_linear_infinite]">
+          <g style={{ transformOrigin: "300px 300px", willChange: "transform" }} className="[animation:orbit_60s_linear_infinite]">
             <circle
               cx="300"
               cy="300"

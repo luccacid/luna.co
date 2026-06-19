@@ -19,7 +19,22 @@ export function MoonToday() {
   const [phase, setPhase] = useState<number | null>(null);
   useEffect(() => setPhase(moonPhase()), []);
 
-  if (phase === null) return null;
+  // Antes da hidratação (SSR/primeiro paint) renderizamos um placeholder
+  // invisível com a MESMA estrutura/dimensões — assim a linha do footer não
+  // sofre reflow (CLS) quando a fase real entra. `&nbsp;` reserva a altura.
+  if (phase === null) {
+    return (
+      <span
+        aria-hidden
+        className="inline-flex items-center gap-2.5 font-mono text-[11px] uppercase tracking-[0.18em] text-[#8a8a8a] opacity-0"
+      >
+        <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" aria-hidden>
+          <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" strokeOpacity="0.3" />
+        </svg>
+        {" "}
+      </span>
+    );
+  }
   // Fração iluminada: 0 na lua nova, 1 na cheia.
   const lit = (1 - Math.cos(phase * 2 * Math.PI)) / 2;
 

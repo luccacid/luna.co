@@ -58,18 +58,21 @@ export function SiteNav() {
     if (!open) return;
     closeBtnRef.current?.focus();
     const main = document.querySelector("main");
-    navRef.current?.toggleAttribute("inert", true);
-    main?.toggleAttribute("inert", true);
+    // Copia o nó para uma variável local: o cleanup não deve ler navRef.current
+    // (pode ter mudado até lá) — usa a referência capturada na execução do efeito.
+    const nav = navRef.current;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setOpen(false);
         burgerRef.current?.focus();
       }
     };
+    nav?.toggleAttribute("inert", true);
+    main?.toggleAttribute("inert", true);
     window.addEventListener("keydown", onKey);
     return () => {
       window.removeEventListener("keydown", onKey);
-      navRef.current?.toggleAttribute("inert", false);
+      nav?.toggleAttribute("inert", false);
       main?.toggleAttribute("inert", false);
     };
   }, [open]);
@@ -80,7 +83,7 @@ export function SiteNav() {
         ref={navRef}
         aria-label="Principal"
         className={cn(
-          "glass sticky top-0 z-50 border-b transition-colors duration-300",
+          "glass sticky top-0 z-nav border-b transition-colors duration-300",
           scrolled ? "border-line" : "border-transparent"
         )}
       >
@@ -145,7 +148,7 @@ export function SiteNav() {
         aria-modal="true"
         aria-label="Menu de navegação"
         className={cn(
-          "on-dark fixed inset-0 z-[70] flex flex-col bg-[#141414] text-paper transition-[opacity,visibility] duration-500 md:hidden",
+          "on-dark fixed inset-0 z-mobile-menu flex flex-col bg-dark text-paper transition-[opacity,visibility] duration-500 md:hidden",
           open ? "visible opacity-100" : "invisible opacity-0"
         )}
       >

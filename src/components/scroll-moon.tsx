@@ -56,7 +56,7 @@ export function ScrollMoon() {
     <a
       href="#top"
       aria-label="Voltar ao topo"
-      className="fixed bottom-6 right-6 z-50 hidden h-12 w-12 items-center justify-center mix-blend-difference md:flex"
+      className="fixed bottom-6 right-6 z-nav hidden h-12 w-12 items-center justify-center mix-blend-difference md:flex"
     >
       {/* Trilho + anel de progresso (girado -90° para começar no topo) */}
       <svg viewBox="0 0 48 48" className="h-12 w-12 -rotate-90">
@@ -81,9 +81,11 @@ export function ScrollMoon() {
         <circle ref={litRef} cx="24" cy="24" r="14" fill="#fafafa" style={{ opacity: 0.12 }} />
       </svg>
 
-      {/* Porcentagem de leitura */}
+      {/* Porcentagem de leitura — decorativa: o número anunciado sozinho não
+          tem significado, e o link já se chama "Voltar ao topo". */}
       <span
         ref={labelRef}
+        aria-hidden
         className="absolute -bottom-4 font-mono text-[9px] tracking-[0.15em] text-paper/80"
       >
         0

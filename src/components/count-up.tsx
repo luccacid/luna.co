@@ -28,6 +28,9 @@ export function CountUp({
     const el = ref.current;
     if (!el) return;
 
+    // Permite re-animar quando `value`/`duration` mudam (deps do efeito).
+    done.current = false;
+
     // Acessibilidade: sem movimento → vai direto ao valor final.
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setN(value);

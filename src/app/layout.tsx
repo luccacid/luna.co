@@ -28,8 +28,15 @@ export const metadata: Metadata = {
     "luna&co — a digital systems studio. Building Digital Systems.",
   // basePath não é aplicado a metadata.icons no export estático — prefixo
   // manual p/ não dar 404 em /luna.co. ponytail: remover o /luna.co ao migrar
-  // para domínio próprio.
-  icons: { icon: "/luna.co/favicon.svg" },
+  // para domínio próprio. SVG cobre browsers modernos; .ico = fallback legado;
+  // apple-touch = ícone de home screen no iOS.
+  icons: {
+    icon: [
+      { url: "/luna.co/favicon.svg", type: "image/svg+xml" },
+      { url: "/luna.co/favicon.ico", sizes: "32x32" },
+    ],
+    apple: "/luna.co/apple-touch-icon.png",
+  },
   alternates: { canonical: "/" },
   openGraph: {
     title: "luna&co — Building Digital Systems",
@@ -38,14 +45,14 @@ export const metadata: Metadata = {
     url: "/",
     siteName: "luna&co",
     images: [
-      { url: "/og.svg", width: 1200, height: 630, alt: "luna&co — Building Digital Systems" },
+      { url: "/og.png", width: 1200, height: 630, alt: "luna&co — Building Digital Systems" },
     ],
   },
   twitter: {
     card: "summary_large_image",
     title: "luna&co — Building Digital Systems",
     description: "luna&co — Building Digital Systems.",
-    images: ["/og.svg"],
+    images: ["/og.png"],
   },
 };
 

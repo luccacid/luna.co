@@ -65,8 +65,12 @@
   * {
     @apply border-border;
   }
-  html {
-    scroll-behavior: smooth; /* fallback nativo (o Lenis assume quando ativo) */
+  /* Smooth nativo só para quem não pede menos movimento (o Lenis assume quando
+     ativo). Gating no nível da media-query além do override de reduced-motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
   }
   body {
     @apply bg-background text-foreground;
@@ -122,10 +126,10 @@
     border-radius: 2px;
   }
 
-  /* Âncoras param abaixo da nav fixa (66px) no fallback de scroll nativo */
+  /* Âncoras param abaixo da nav fixa (h-[66px]) no fallback de scroll nativo */
   section[id],
   header[id] {
-    scroll-margin-top: 72px;
+    scroll-margin-top: 66px;
   }
 }
 
@@ -229,27 +233,30 @@
    As luas laterais (cx 230 e 410) convergem para o centro (cx 320) conforme
    o usuário rola o primeiro viewport — o eclipse literalmente acontece sob o
    dedo. Progressive enhancement: só roda onde houver scroll-driven
-   animations; nos demais browsers o hero fica como era. */
-@supports (animation-timeline: scroll()) {
-  @keyframes converge-l {
-    to {
-      transform: translateX(90px);
+   animations; nos demais browsers o hero fica como era. Gated por
+   prefers-reduced-motion no nível da media-query (além do override abaixo). */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: scroll()) {
+    @keyframes converge-l {
+      to {
+        transform: translateX(90px);
+      }
     }
-  }
-  @keyframes converge-r {
-    to {
-      transform: translateX(-90px);
+    @keyframes converge-r {
+      to {
+        transform: translateX(-90px);
+      }
     }
-  }
-  .eclipse-left {
-    animation: converge-l linear both;
-    animation-timeline: scroll(root);
-    animation-range: 0 90vh;
-  }
-  .eclipse-right {
-    animation: converge-r linear both;
-    animation-timeline: scroll(root);
-    animation-range: 0 90vh;
+    .eclipse-left {
+      animation: converge-l linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 90vh;
+    }
+    .eclipse-right {
+      animation: converge-r linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 90vh;
+    }
   }
 }
 
@@ -387,6 +394,7 @@ html.lenis body {
     display: inline-flex;
     width: max-content;
     animation: marquee 60s linear infinite;
+    will-change: transform;
   }
   .marquee-mask:hover .marquee-track {
     animation-play-state: paused;

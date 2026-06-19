@@ -20,10 +20,23 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      // Camadas de empilhamento nomeadas — substituem z-index arbitrários
+      // espalhados pelos componentes (nav/hud < grão < menu mobile < cursor <
+      // preloader). Mantém o stacking explícito e auditável num só lugar.
+      zIndex: {
+        nav: "50",
+        grain: "60",
+        "mobile-menu": "70",
+        cursor: "110",
+        preloader: "120",
+      },
       colors: {
         // Paleta neutra da marca (eclipse por opacidade, não por matiz).
         ink: "#1a1a1a",
         paper: "#fafafa",
+        // Superfícies escuras das seções (hero/about/footer/overlays).
+        dark: "var(--dark)",
+        dark2: "var(--dark-2)",
         // Acento "ember" — a cor da lua em eclipse total. Regra de uso:
         // só em estados vivos (seção ativa, seleção, ponto orbital) — <1% da página.
         ember: {

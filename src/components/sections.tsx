@@ -33,7 +33,7 @@ function Kicker({ children, dark = false }: { children: React.ReactNode; dark?: 
         dark ? "text-[#8a8a8a]" : "text-[#6b6b6b]"
       }`}
     >
-      <Plus className="h-3 w-3" strokeWidth={2} />
+      <Plus className="h-3 w-3" strokeWidth={2} aria-hidden />
       {children}
     </span>
   );
@@ -44,7 +44,7 @@ function Kicker({ children, dark = false }: { children: React.ReactNode; dark?: 
 /* ================================================================== */
 export function Statement() {
   return (
-    <section id="manifesto" className="relative bg-paper py-28 md:py-40">
+    <section id="manifesto" tabIndex={-1} className="relative bg-paper py-28 md:py-40">
       <div className="rail">
         <Reveal className="mb-12">
           <Kicker>Lorem ipsum</Kicker>
@@ -83,7 +83,7 @@ export function Statement() {
             {/* Botão circular com efeito magnético */}
             <Magnetic strength={0.5}>
               <span className="flex h-10 w-10 items-center justify-center rounded-full border border-ink/20 transition-all duration-300 group-hover:border-ink group-hover:bg-ink group-hover:text-paper">
-                <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:rotate-45" />
+                <ArrowUpRight aria-hidden className="h-4 w-4 transition-transform duration-300 group-hover:rotate-45" />
               </span>
             </Magnetic>
           </a>
@@ -99,13 +99,17 @@ export function Statement() {
 const MARQUEE_WORDS = ["LOREM", "IPSUM", "DOLOR", "SIT AMET", "CONSECTETUR", "ADIPISCING", "ELIT"];
 
 /**
- * Um "grupo" do marquee. A lista é repetida 4× para que um único grupo fique
- * mais largo que qualquer viewport (inclusive ultrawide). Como a faixa usa dois
- * grupos idênticos e anima `translateX(-50%)`, o grupo 2 cai exatamente onde o
- * grupo 1 começou — loop contínuo, sem buraco.
+ * Sequência expandida do marquee, computada UMA vez no carregamento do módulo
+ * (não a cada render de cada grupo). A lista é repetida 2× para que um único
+ * grupo fique mais largo que viewports comuns; como a faixa usa dois grupos
+ * idênticos e anima `translateX(-50%)`, o grupo 2 cai exatamente onde o grupo 1
+ * começou — loop contínuo, sem buraco.
  */
+const MARQUEE_SEQ = Array.from({ length: 2 }).flatMap(() => MARQUEE_WORDS);
+
+/** Um "grupo" do marquee — renderiza a sequência pré-computada. */
 function MarqueeGroup() {
-  const seq = Array.from({ length: 4 }).flatMap(() => MARQUEE_WORDS);
+  const seq = MARQUEE_SEQ;
   return (
     <div aria-hidden className="flex shrink-0 items-center">
       {seq.map((w, i) => (
@@ -124,7 +128,7 @@ function MarqueeGroup() {
 
 export function TrustBar() {
   return (
-    <div className="marquee-mask overflow-hidden border-y border-line bg-paper py-7">
+    <div aria-hidden className="marquee-mask overflow-hidden border-y border-line bg-paper py-7">
       <div className="marquee-track">
         <MarqueeGroup />
         <MarqueeGroup />
@@ -180,7 +184,11 @@ export function Services() {
         <div className="border-t border-line">
           {SERVICES.map((s, i) => (
             <Reveal key={s.title} delay={i * 70}>
-              <a href="#contato" className="group relative block border-b border-line">
+              <a
+                href="#contato"
+                aria-label={s.title}
+                className="group relative block border-b border-line"
+              >
                 {/* Camada de tinta que "sobe" preenchendo a linha no hover */}
                 <span className="absolute inset-0 origin-bottom scale-y-0 bg-ink transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-y-100" />
 
@@ -190,13 +198,16 @@ export function Services() {
                     0{i + 1}
                   </span>
 
-                  {/* Título (desliza e inverte de cor sobre a tinta) */}
-                  <h3 className="col-span-10 font-mono text-[clamp(24px,3.4vw,40px)] font-medium tracking-[-0.01em] text-ink transition-all duration-300 group-hover:translate-x-2 group-hover:text-paper md:col-span-5">
+                  {/* Título (desliza e inverte de cor sobre a tinta).
+                      É um <span>, não <h3>: heading dentro de <a> é HTML
+                      inválido e inflaria o nome acessível do link — o título
+                      vai no aria-label do <a>. */}
+                  <span className="col-span-10 block font-mono text-[clamp(24px,3.4vw,40px)] font-medium tracking-[-0.01em] text-ink transition-all duration-300 group-hover:translate-x-2 group-hover:text-paper md:col-span-5">
                     {s.title}
-                  </h3>
+                  </span>
 
                   {/* Descrição + tags */}
-                  <p className="col-span-9 col-start-3 text-[14.5px] text-muted-foreground transition-colors duration-300 group-hover:text-[#b3b3b3] md:col-span-4 md:col-start-7">
+                  <p className="col-span-9 col-start-3 text-[14px] text-muted-foreground transition-colors duration-300 group-hover:text-[#b3b3b3] md:col-span-4 md:col-start-7">
                     {s.body}
                     <span className="mt-2 block font-mono text-[11px] uppercase tracking-[0.16em] text-[#bbb] transition-colors duration-300 group-hover:text-[#777]">
                       {s.tags}
@@ -206,6 +217,7 @@ export function Services() {
                   {/* Seta (gira 45° no hover) */}
                   <span className="col-span-12 hidden justify-end md:col-span-1 md:flex">
                     <ArrowUpRight
+                      aria-hidden
                       className="h-7 w-7 text-ink transition-all duration-300 group-hover:rotate-45 group-hover:text-paper"
                       strokeWidth={1.4}
                     />
@@ -236,7 +248,7 @@ const STATS: { n?: string; count?: number; suffix?: string; l: string }[] = [
 
 export function About() {
   return (
-    <section id="sobre" className="on-dark bg-[#141414] py-28 text-paper">
+    <section id="sobre" className="on-dark bg-dark py-28 text-paper">
       <div className="rail">
         <Reveal className="mb-16 max-w-[640px]">
           <Kicker dark>Lorem ipsum</Kicker>
@@ -257,24 +269,27 @@ export function About() {
           <PartnersEclipse />
         </Reveal>
 
-        {/* Estatísticas inline — separadas por filete, sem caixas */}
+        {/* Estatísticas inline — separadas por filete, sem caixas.
+            <dl> de term/description: cada estatística é um par rótulo (<dt>)
+            + valor (<dd>). As classes de grid/filete migram para o <dl> para
+            o visual ficar idêntico ao layout anterior. */}
         <Reveal delay={160}>
-          <div className="mt-20 grid grid-cols-2 divide-x divide-[#2a2a2a] border-t border-[#2a2a2a] md:grid-cols-4">
+          <dl className="mt-20 grid grid-cols-2 divide-x divide-[#2a2a2a] border-t border-[#2a2a2a] md:grid-cols-4">
             {STATS.map((s) => (
               <div key={s.l} className="px-6 py-8 first:pl-0">
-                <p className="font-mono text-[clamp(36px,5vw,56px)] font-medium leading-none text-white">
+                <dd className="font-mono text-[clamp(36px,5vw,56px)] font-medium leading-none text-white">
                   {s.count !== undefined ? (
                     <CountUp value={s.count} suffix={s.suffix} />
                   ) : (
                     s.n
                   )}
-                </p>
-                <p className="mt-3 font-mono text-[12px] uppercase tracking-[0.18em] text-[#888]">
+                </dd>
+                <dt className="mt-3 font-mono text-[12px] uppercase tracking-[0.18em] text-[#888]">
                   {s.l}
-                </p>
+                </dt>
               </div>
             ))}
-          </div>
+          </dl>
         </Reveal>
       </div>
     </section>
@@ -345,7 +360,7 @@ export function Process() {
 /* ================================================================== */
 export function FinalCta() {
   return (
-    <section id="contato" className="on-dark relative overflow-hidden bg-[#141414] py-32 text-paper">
+    <section id="contato" className="on-dark relative overflow-hidden bg-dark py-32 text-paper">
       <div className="starfield pointer-events-none absolute inset-0 [animation:twinkle_11s_ease-in-out_infinite]" />
 
       {/* Eclipse gigante, cortado, "vazando" pela base — respirando em opacidade */}
@@ -405,7 +420,7 @@ export function FinalCta() {
 /* ================================================================== */
 export function SiteFooter() {
   return (
-    <footer className="on-dark border-t border-[#262626] bg-[#141414] py-16 text-[#888]">
+    <footer className="on-dark border-t border-[#262626] bg-dark py-16 text-[#888]">
       <div className="rail">
         {/* Wordmark gigante como elemento gráfico — o "&" é o próprio símbolo */}
         <div className="mb-14">

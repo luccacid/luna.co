@@ -8,7 +8,7 @@
  * Desligado em telas de toque (pointer grosso) e sob `prefers-reduced-motion`,
  * onde o efeito só atrapalharia.
  */
-import { useRef, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 export function Magnetic({
@@ -22,18 +22,22 @@ export function Magnetic({
   className?: string;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
+  // Habilitado só em mouse fino sem preferência por menos movimento. As media
+  // conditions não mudam durante a sessão → avaliamos UMA vez na montagem, em
+  // vez de duas chamadas a matchMedia a cada pointermove.
+  const enabledRef = useRef(false);
 
-  /** Só habilita em dispositivos com mouse fino e sem preferência por menos movimento. */
-  const enabled = () =>
-    typeof window !== "undefined" &&
-    window.matchMedia("(hover: hover)").matches &&
-    !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  useEffect(() => {
+    enabledRef.current =
+      window.matchMedia("(hover: hover)").matches &&
+      !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }, []);
 
   // A cada movimento, desloca o elemento proporcionalmente à distância entre o
   // ponteiro e o centro do próprio elemento.
   const onMove = (e: React.PointerEvent) => {
     const el = ref.current;
-    if (!el || !enabled()) return;
+    if (!el || !enabledRef.current) return;
     const r = el.getBoundingClientRect();
     const x = e.clientX - (r.left + r.width / 2);
     const y = e.clientY - (r.top + r.height / 2);

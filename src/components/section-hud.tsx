@@ -30,7 +30,7 @@ export function SectionHud() {
     <div
       aria-hidden
       className={cn(
-        "pointer-events-none fixed bottom-6 left-6 z-50 hidden items-baseline gap-3 font-mono text-[10px] uppercase tracking-[0.22em] text-paper mix-blend-difference transition-opacity duration-500 md:flex",
+        "pointer-events-none fixed bottom-6 left-6 z-nav hidden items-baseline gap-3 font-mono text-[10px] uppercase tracking-[0.22em] text-paper mix-blend-difference transition-opacity duration-500 md:flex",
         // Some no hero (nenhuma seção ativa) e reaparece ao entrar no conteúdo.
         idx === -1 ? "opacity-0" : "opacity-100"
       )}

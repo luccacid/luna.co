@@ -31,7 +31,7 @@ export function EclipseField() {
     let ty = 0; // alvo Y
     let cx = 0; // posição atual X (interpolada)
     let cy = 0; // posição atual Y
-    let inView = true;
+    let inView = true; // lido dentro de onMove para evitar trabalho fora da view
 
     // A cada frame, aproxima a posição atual do alvo (damping de 6%). Quando
     // converge (< 0.1px), o loop dorme até o próximo pointermove.
@@ -49,6 +49,8 @@ export function EclipseField() {
 
     // Converte a posição do ponteiro em um deslocamento de no máx. ±20px.
     const onMove = (e: PointerEvent) => {
+      // Hero fora da viewport → nada a fazer (sem cálculo nem rAF).
+      if (!inView) return;
       const { innerWidth: w, innerHeight: h } = window;
       tx = (e.clientX / w - 0.5) * 40;
       ty = (e.clientY / h - 0.5) * 40;
@@ -79,15 +81,16 @@ export function EclipseField() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute right-[-12%] top-1/2 z-0 hidden -translate-y-1/2 will-change-transform md:block"
+      className="pointer-events-none absolute right-[-12%] top-1/2 z-0 hidden -translate-y-1/2 md:block"
     >
-      <div ref={ref}>
+      {/* will-change só no nó que de fato recebe style.transform a cada frame */}
+      <div ref={ref} className="will-change-transform">
         <svg viewBox="0 0 600 600" className="h-[120vh] max-h-[820px] w-auto">
           {/* Anel fino que orbita o conjunto — o satélite é o único ponto
               de cor (ember) da identidade */}
           <g
             className="origin-center [animation:orbit_48s_linear_infinite]"
-            style={{ transformOrigin: "300px 300px" }}
+            style={{ transformOrigin: "300px 300px", willChange: "transform" }}
           >
             <circle
               cx="300"

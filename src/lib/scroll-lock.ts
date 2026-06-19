@@ -11,8 +11,18 @@ import type Lenis from "lenis";
 /** Registrado pelo <SmoothScroll> ao montar; `null` quando inativo. */
 export const lenisRef: { current: Lenis | null } = { current: null };
 
+/**
+ * Contador de travas ativas. Reference-counted porque dois donos (Preloader e
+ * SiteNav) podem travar ao mesmo tempo — com um booleano, o primeiro a soltar
+ * destravaria a página enquanto o outro ainda precisava dela travada. O scroll
+ * fica preso enquanto o contador > 0.
+ */
+let lockCount = 0;
+
 export function lockScroll(locked: boolean) {
-  document.body.style.overflow = locked ? "hidden" : "";
-  if (locked) lenisRef.current?.stop();
+  lockCount = Math.max(0, lockCount + (locked ? 1 : -1));
+  const isLocked = lockCount > 0;
+  document.body.style.overflow = isLocked ? "hidden" : "";
+  if (isLocked) lenisRef.current?.stop();
   else lenisRef.current?.start();
 }

@@ -10,7 +10,7 @@
  * e o ScrollMoon) continua funcionando normalmente.
  */
 import { useEffect } from "react";
-import Lenis from "lenis";
+import type Lenis from "lenis";
 import { lenisRef } from "@/lib/scroll-lock";
 
 export function SmoothScroll() {
@@ -18,49 +18,65 @@ export function SmoothScroll() {
     // Respeita a preferência por menos movimento: não ativa o smooth scroll.
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const lenis = new Lenis({
-      duration: 1.1,
-      // easeOutExpo — desaceleração suave ao fim da rolagem.
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true,
-      // Scheduler interno do Lenis: cede ao browser quando ocioso, em vez de
-      // um requestAnimationFrame nosso rodando a 60fps a página inteira.
-      autoRaf: true,
-    });
-    // Registra a instância para o lockScroll (menu mobile/preloader).
-    lenisRef.current = lenis;
+    // `cancelled` cobre o caso de o efeito ser limpo antes do import resolver.
+    let cancelled = false;
+    let lenis: Lenis | null = null;
+    let onClick: ((e: MouseEvent) => void) | null = null;
 
-    // Intercepta cliques em links de âncora para rolar suavemente até a seção.
-    const onClick = (e: MouseEvent) => {
-      const anchor = (e.target as HTMLElement)?.closest?.('a[href^="#"]');
-      if (!anchor) return;
-      const href = anchor.getAttribute("href");
-      if (!href || href === "#") return;
+    // Import dinâmico: o Lenis sai do bundle inicial e só carrega quando o
+    // smooth scroll é de fato ativado (não sob reduced-motion).
+    (async () => {
+      const { default: Lenis } = await import("lenis");
+      if (cancelled) return;
 
-      // getElementById não lança com ids "estranhos", diferente de querySelector.
-      const target = document.getElementById(href.slice(1));
-      if (!target) return;
-
-      e.preventDefault();
-      lenis.scrollTo(target, { offset: -8 });
-      // Mantém a URL compartilhável e leva o foco junto com a rolagem (a11y).
-      history.pushState(null, "", href);
-      target.setAttribute("tabindex", "-1");
-      target.focus({ preventScroll: true });
-      // Remove o tabindex ao perder o foco — não polui o DOM nem deixa a
-      // seção num estado focável inesperado.
-      target.addEventListener("blur", () => target.removeAttribute("tabindex"), {
-        once: true,
+      lenis = new Lenis({
+        duration: 1.1,
+        // easeOutExpo — desaceleração suave ao fim da rolagem.
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        smoothWheel: true,
+        // Scheduler interno do Lenis: cede ao browser quando ocioso, em vez de
+        // um requestAnimationFrame nosso rodando a 60fps a página inteira.
+        autoRaf: true,
       });
-    };
-    document.addEventListener("click", onClick);
+      // Registra a instância para o lockScroll (menu mobile/preloader).
+      lenisRef.current = lenis;
+
+      // Intercepta cliques em links de âncora para rolar suavemente até a seção.
+      onClick = (e: MouseEvent) => {
+        const anchor = (e.target as HTMLElement)?.closest?.('a[href^="#"]');
+        if (!anchor) return;
+        const href = anchor.getAttribute("href");
+        if (!href || href === "#") return;
+
+        // getElementById não lança com ids "estranhos", diferente de querySelector.
+        const target = document.getElementById(href.slice(1));
+        if (!target) return;
+
+        e.preventDefault();
+        lenis!.scrollTo(target, { offset: -8 });
+        // Mantém a URL compartilhável e leva o foco junto com a rolagem (a11y).
+        history.pushState(null, "", href);
+        target.setAttribute("tabindex", "-1");
+        target.focus({ preventScroll: true });
+        // Remove o tabindex ao perder o foco — não polui o DOM nem deixa a
+        // seção num estado focável inesperado.
+        target.addEventListener("blur", () => target.removeAttribute("tabindex"), {
+          once: true,
+        });
+      };
+      document.addEventListener("click", onClick);
+    })();
 
     // Limpeza ao desmontar: remove o listener e destrói o Lenis (que para o
-    // próprio rAF interno).
+    // próprio rAF interno). O flag `cancelled` evita criar o Lenis se o import
+    // resolver depois do unmount.
     return () => {
-      document.removeEventListener("click", onClick);
-      lenisRef.current = null;
-      lenis.destroy();
+      cancelled = true;
+      if (onClick) document.removeEventListener("click", onClick);
+      if (lenis) {
+        lenisRef.current = null;
+        lenis.destroy();
+      }
     };
   }, []);
 

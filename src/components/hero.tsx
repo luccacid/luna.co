@@ -17,7 +17,7 @@ export function Hero() {
     <section
       id="top"
       aria-label="Hero"
-      className="on-dark relative flex min-h-[100svh] flex-col overflow-hidden bg-[#141414] text-paper"
+      className="on-dark relative flex min-h-[100svh] flex-col overflow-hidden bg-dark text-paper"
     >
       {/* Estrelas piscando (twinkle) + eclipse com parallax ao fundo */}
       <div className="starfield pointer-events-none absolute inset-0 [animation:twinkle_9s_ease-in-out_infinite]" />

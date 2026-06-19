@@ -53,7 +53,7 @@ export function Preloader() {
   return (
     <div
       aria-hidden
-      className={`fixed inset-0 z-[120] flex flex-col items-center justify-center bg-[#141414] transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] ${
+      className={`fixed inset-0 z-preloader flex flex-col items-center justify-center bg-dark transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] ${
         leaving ? "pointer-events-none -translate-y-full opacity-0" : "opacity-100"
       }`}
     >
