@@ -1,0 +1,394 @@
+/* ==========================================================================
+   Estilos globais — luna&co
+   --------------------------------------------------------------------------
+   Ordem do arquivo:
+     1. Camadas base do Tailwind
+     2. Tokens de tema (variáveis CSS) e reset/base
+     3. Componentes utilitários (.rail, .glass, .wordmark, marquee)
+     4. Utilitários (.starfield, .reveal, .grain)
+     5. Keyframes (todas as animações da página)
+     6. Integração com o Lenis (smooth scroll)
+     7. Acessibilidade: prefers-reduced-motion
+   ========================================================================== */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* ---- Tokens luna&co — neutro monocromático (eclipse por opacidade) ----
+       Os tokens HSL alimentam as cores do Tailwind (background, border, etc.).
+       Mantemos tudo em escala de cinza: a hierarquia vem da opacidade, não da
+       cor. */
+    --background: 0 0% 98%;      /* papel  #fafafa */
+    --foreground: 0 0% 10%;      /* tinta  #1a1a1a */
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 10%;
+    --primary: 0 0% 10%;         /* tinta como ação primária */
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 10%;
+    --muted: 0 0% 94%;
+    --muted-foreground: 0 0% 40%;   /* #666 — texto secundário */
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 10%;
+    --border: 0 0% 92.5%;           /* #ececec — filetes */
+    --input: 0 0% 92.5%;
+    --ring: 0 0% 10%;
+    --radius: 0.75rem;
+
+    /* Cores cruas referenciadas direto nas seções escuras (hero/about/footer) */
+    --ink: #1a1a1a;
+    --paper: #fafafa;
+    --dark: #141414;
+    --dark-2: #1c1c1c;
+    --line: #ececec;
+    --muted-ink: #666666;
+    --muted-ink-d: #999999;
+
+    /* Acento "ember" — a cor da lua em eclipse total. Aparece apenas em
+       estados vivos (seleção, seção ativa, ponto orbital): <1% da página. */
+    --ember: #c2410c; /* sobre papel (4.6:1 — passa AA) */
+    --ember-bright: #ea580c; /* sobre fundo escuro */
+
+    /* Tipografia — Geist Mono self-hosted (via next/font: zero requisição
+       externa, mesma voz em macOS/Windows/Linux) com fallback para as monos
+       de sistema. Sans = corpo. */
+    --font-mono: var(--font-geist-mono, "SF Mono"), "SFMono-Regular",
+      "Consolas", "Liberation Mono", "Menlo", "Courier New", monospace;
+    --font-sans: "Helvetica Neue", "Inter", Arial, system-ui, sans-serif;
+  }
+}
+
+@layer base {
+  /* Borda padrão de todos os elementos = token --border */
+  * {
+    @apply border-border;
+  }
+  html {
+    scroll-behavior: smooth; /* fallback nativo (o Lenis assume quando ativo) */
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Seleção de texto: o momento "eclipse total" — âmbar translúcido */
+  ::selection {
+    background: rgba(194, 65, 12, 0.18);
+  }
+  /* Nas seções escuras (.on-dark) o ember claro garante seleção visível */
+  .on-dark ::selection {
+    background: rgba(234, 88, 12, 0.3);
+  }
+
+  /* Scrollbar discreta */
+  ::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.16);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.28);
+  }
+
+  /* Headlines gigantes sem viúvas/quebras feias */
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  /* Números tabulares na voz mono — CountUp e ScrollMoon sem "tremor"
+     de largura enquanto os dígitos mudam */
+  .font-mono,
+  .wordmark {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Foco visível para navegação por teclado (a página é hover-cêntrica) */
+  :focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 4px;
+    border-radius: 2px;
+  }
+
+  /* Âncoras param abaixo da nav fixa (66px) no fallback de scroll nativo */
+  section[id],
+  header[id] {
+    scroll-margin-top: 72px;
+  }
+}
+
+@layer components {
+  /* Trilho de conteúdo centralizado — largura máxima + respiro lateral */
+  .rail {
+    @apply mx-auto w-full max-w-[1080px] px-7;
+  }
+
+  /* Superfície fosca da navegação (vidro) */
+  .glass {
+    background: rgba(250, 250, 250, 0.82);
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+  }
+
+  /* A wordmark — mono, peso 500, levemente tracked */
+  .wordmark {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+  }
+}
+
+@layer utilities {
+  /* Campo de estrelas tênue sobre os gradientes escuros (hero/CTA) */
+  .starfield {
+    background-image:
+      radial-gradient(2px 2px at 20% 30%, rgba(255, 255, 255, 0.18), transparent),
+      radial-gradient(2px 2px at 82% 22%, rgba(255, 255, 255, 0.14), transparent),
+      radial-gradient(1.5px 1.5px at 60% 70%, rgba(255, 255, 255, 0.12), transparent),
+      radial-gradient(1.5px 1.5px at 36% 84%, rgba(255, 255, 255, 0.1), transparent),
+      radial-gradient(1.5px 1.5px at 70% 48%, rgba(255, 255, 255, 0.08), transparent);
+  }
+
+  /* Scroll-reveal: escondido até o observer adicionar `.is-visible` (ver Reveal) */
+  .reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================================================
+   KEYFRAMES
+   Obs.: animações referenciadas por valores arbitrários do Tailwind
+   (ex.: `[animation:breathe_...]` ou `animate-[eclipse_...]`) PRECISAM ter o
+   keyframe declarado aqui — o Tailwind não os gera automaticamente nesse caso.
+   ========================================================================== */
+
+/* Movimento-assinatura: a luz viaja da lua nova → cheia (símbolo da marca). */
+@keyframes eclipse {
+  0% {
+    opacity: 0.28;
+  }
+  50% {
+    opacity: 0.92;
+  }
+  100% {
+    opacity: 0.28;
+  }
+}
+
+/* Sublinhado/divisória que "cresce" na horizontal. */
+@keyframes grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Marquee infinito — a faixa rola para sempre (-50% = um grupo). */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Rotação orbital lenta dos anéis do eclipse ambiente. */
+@keyframes orbit {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---- Eclipse dirigido pelo scroll (hero) --------------------------------
+   As luas laterais (cx 230 e 410) convergem para o centro (cx 320) conforme
+   o usuário rola o primeiro viewport — o eclipse literalmente acontece sob o
+   dedo. Progressive enhancement: só roda onde houver scroll-driven
+   animations; nos demais browsers o hero fica como era. */
+@supports (animation-timeline: scroll()) {
+  @keyframes converge-l {
+    to {
+      transform: translateX(90px);
+    }
+  }
+  @keyframes converge-r {
+    to {
+      transform: translateX(-90px);
+    }
+  }
+  .eclipse-left {
+    animation: converge-l linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 90vh;
+  }
+  .eclipse-right {
+    animation: converge-r linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 90vh;
+  }
+}
+
+/* Jogo de opacidade — as luas "respiram" entre apagado e aceso. Multiplica a
+   opacidade-base do <g> pai, então cada lua mantém seu lugar na hierarquia. */
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Cintilar do campo de estrelas — a camada inteira pulsa de opacidade. */
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Pulso sutil em trechos editoriais cinza. */
+@keyframes pulse-dim {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+/* Preloader: o símbolo sobe na entrada. */
+@keyframes intro-rise {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+/* Preloader: a barra de progresso se preenche. */
+@keyframes intro-bar {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* ---- Lenis (smooth scroll) ----------------------------------------------
+   Classes que o Lenis aplica ao <html>; ajustes recomendados pela lib. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important; /* evita conflito com o smooth nativo */
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* ---- Grão (ruído) — camada fixa e mesclada sobre tudo, dá textura --------
+   SVG de fractalNoise embutido como data-URI; bem sutil (opacity 0.04). */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
+/* ---- Acessibilidade: respeitar quem pede menos movimento ----------------
+   Zera scroll-behavior, neutraliza o reveal e "congela" todas as animações
+   e transições (duração ~0). Cobre inclusive as animações por valor arbitrário. */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+  }
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  /* Animações por scroll-timeline ignoram duration — desligar explicitamente */
+  .eclipse-left,
+  .eclipse-right {
+    animation: none !important;
+  }
+}
+
+@layer components {
+  /* Marquee — máscara que esmaece as bordas e a trilha animada.
+     A trilha tem dois grupos idênticos e translada -50% (um grupo), criando o
+     loop sem emenda. Pausa ao passar o mouse. */
+  .marquee-mask {
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent,
+      #000 12%,
+      #000 88%,
+      transparent
+    );
+    mask-image: linear-gradient(
+      90deg,
+      transparent,
+      #000 12%,
+      #000 88%,
+      transparent
+    );
+  }
+  .marquee-track {
+    display: inline-flex;
+    width: max-content;
+    animation: marquee 60s linear infinite;
+  }
+  .marquee-mask:hover .marquee-track {
+    animation-play-state: paused;
+  }
+}
