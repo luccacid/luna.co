@@ -34,6 +34,7 @@ export function SiteNav() {
 
   const burgerRef = useRef<HTMLButtonElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const navRef = useRef<HTMLElement>(null);
 
   // Observa o scroll para alternar a borda da barra.
   useEffect(() => {
@@ -50,10 +51,15 @@ export function SiteNav() {
   }, [open]);
 
   // Diálogo acessível: foco entra no botão fechar ao abrir, Escape fecha e
-  // devolve o foco ao hambúrguer.
+  // devolve o foco ao hambúrguer. Enquanto aberto, o resto da página fica
+  // `inert` — contém o foco no diálogo sem precisar de focus-trap manual
+  // (WCAG 2.1.2). ponytail: inert nativo cobre todos os browsers atuais.
   useEffect(() => {
     if (!open) return;
     closeBtnRef.current?.focus();
+    const main = document.querySelector("main");
+    navRef.current?.toggleAttribute("inert", true);
+    main?.toggleAttribute("inert", true);
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setOpen(false);
@@ -61,12 +67,18 @@ export function SiteNav() {
       }
     };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      navRef.current?.toggleAttribute("inert", false);
+      main?.toggleAttribute("inert", false);
+    };
   }, [open]);
 
   return (
     <>
       <nav
+        ref={navRef}
+        aria-label="Principal"
         className={cn(
           "glass sticky top-0 z-50 border-b transition-colors duration-300",
           scrolled ? "border-line" : "border-transparent"
@@ -85,7 +97,7 @@ export function SiteNav() {
                 <a
                   key={l.href}
                   href={l.href}
-                  aria-current={isActive ? "true" : undefined}
+                  aria-current={isActive ? "page" : undefined}
                   className={cn(
                     "relative transition-colors hover:text-ink",
                     isActive && "text-ink"
@@ -160,14 +172,14 @@ export function SiteNav() {
         </div>
 
         {/* Links grandes; entram escalonados quando o menu abre */}
-        <nav className="rail relative z-10 flex flex-1 flex-col justify-center gap-2">
+        <nav aria-label="Menu" className="rail relative z-10 flex flex-1 flex-col justify-center gap-2">
           {LINKS.map((l, i) => (
             <a
               key={l.href}
               href={l.href}
               onClick={() => setOpen(false)}
               className={cn(
-                "flex items-baseline justify-between border-b border-[#2a2a2a] py-5 font-mono text-[clamp(34px,11vw,56px)] font-medium tracking-[-0.01em] transition-all duration-500",
+                "flex items-baseline justify-between border-b border-[#2a2a2a] py-5 font-mono text-[clamp(34px,11vw,56px)] font-medium tracking-[-0.01em] transition-[transform,opacity] duration-500",
                 open ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
               )}
               style={{ transitionDelay: open ? `${120 + i * 70}ms` : "0ms" }}

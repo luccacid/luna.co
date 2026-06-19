@@ -14,19 +14,21 @@ import { LunaSymbol } from "./luna-symbol";
 
 export function Hero() {
   return (
-    <header
+    <section
       id="top"
+      aria-label="Hero"
       className="on-dark relative flex min-h-[100svh] flex-col overflow-hidden bg-[#141414] text-paper"
     >
       {/* Estrelas piscando (twinkle) + eclipse com parallax ao fundo */}
       <div className="starfield pointer-events-none absolute inset-0 [animation:twinkle_9s_ease-in-out_infinite]" />
       <EclipseField />
 
-      {/* Rótulos verticais nas margens (só em telas grandes) */}
-      <span className="pointer-events-none absolute left-6 top-1/2 hidden -translate-y-1/2 -rotate-90 font-mono text-[11px] uppercase tracking-tagline text-[#5a5a5a] lg:block">
+      {/* Rótulos verticais nas margens (só em telas grandes) — decorativos,
+          escondidos da AT (duplicam a marca e quebram a ordem de leitura). */}
+      <span aria-hidden className="pointer-events-none absolute left-6 top-1/2 hidden -translate-y-1/2 -rotate-90 font-mono text-[11px] uppercase tracking-tagline text-[#5a5a5a] lg:block">
         luna&amp;co — lorem ipsum
       </span>
-      <span className="pointer-events-none absolute right-6 top-1/2 hidden -translate-y-1/2 rotate-90 font-mono text-[11px] uppercase tracking-tagline text-[#5a5a5a] lg:block">
+      <span aria-hidden className="pointer-events-none absolute right-6 top-1/2 hidden -translate-y-1/2 rotate-90 font-mono text-[11px] uppercase tracking-tagline text-[#5a5a5a] lg:block">
         est. mmxxvi
       </span>
 
@@ -80,11 +82,11 @@ export function Hero() {
           href="#manifesto"
           className="mx-auto inline-flex items-center gap-2 transition-colors hover:text-paper sm:mx-0"
         >
-          <ArrowDown className="h-3.5 w-3.5 animate-bounce" />
+          <ArrowDown aria-hidden className="h-3.5 w-3.5 motion-safe:animate-bounce" />
           Scroll
         </a>
         <span className="hidden sm:inline">00 / 05</span>
       </div>
-    </header>
+    </section>
   );
 }

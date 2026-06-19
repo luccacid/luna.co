@@ -19,16 +19,33 @@ import { MoonCursor } from "@/components/moon-cursor";
  * nome "luna&co" e o slogan "Building Digital Systems".
  */
 export const metadata: Metadata = {
-  // TODO: trocar pelo domínio definitivo quando houver — necessário para
-  // URLs absolutas de OG/Twitter card.
-  metadataBase: new URL("https://luna-co.example.com"),
+  // Origem real do deploy (GitHub Pages). basePath /luna.co é aplicado pelo
+  // Next ao montar URLs absolutas de OG/canonical. Trocar por domínio próprio
+  // quando houver.
+  metadataBase: new URL("https://luccacid.github.io/luna.co"),
   title: "luna&co — Building Digital Systems",
-  description: "luna&co — Building Digital Systems.",
-  icons: { icon: "/favicon.svg" },
+  description:
+    "luna&co — a digital systems studio. Building Digital Systems.",
+  // basePath não é aplicado a metadata.icons no export estático — prefixo
+  // manual p/ não dar 404 em /luna.co. ponytail: remover o /luna.co ao migrar
+  // para domínio próprio.
+  icons: { icon: "/luna.co/favicon.svg" },
+  alternates: { canonical: "/" },
   openGraph: {
     title: "luna&co — Building Digital Systems",
     description: "luna&co — Building Digital Systems.",
     type: "website",
+    url: "/",
+    siteName: "luna&co",
+    images: [
+      { url: "/og.svg", width: 1200, height: 630, alt: "luna&co — Building Digital Systems" },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "luna&co — Building Digital Systems",
+    description: "luna&co — Building Digital Systems.",
+    images: ["/og.svg"],
   },
 };
 
@@ -55,6 +72,20 @@ export default function RootLayout({
     // GeistMono.variable injeta --font-geist-mono (consumida em globals.css).
     <html lang="pt-BR" className={GeistMono.variable}>
       <body className="font-sans">
+        {/* Organization JSON-LD — âncora de entidade/Knowledge Panel. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "luna&co",
+              url: "https://luccacid.github.io/luna.co/",
+              logo: "https://luccacid.github.io/luna.co/favicon.svg",
+              description: "Building Digital Systems",
+            }),
+          }}
+        />
         {/* Atalho de teclado: pula a nav direto para o conteúdo */}
         <a
           href="#manifesto"

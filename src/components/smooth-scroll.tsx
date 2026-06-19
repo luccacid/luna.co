@@ -23,17 +23,12 @@ export function SmoothScroll() {
       // easeOutExpo — desaceleração suave ao fim da rolagem.
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
+      // Scheduler interno do Lenis: cede ao browser quando ocioso, em vez de
+      // um requestAnimationFrame nosso rodando a 60fps a página inteira.
+      autoRaf: true,
     });
     // Registra a instância para o lockScroll (menu mobile/preloader).
     lenisRef.current = lenis;
-
-    // Loop de animação do Lenis via requestAnimationFrame.
-    let raf = 0;
-    const loop = (time: number) => {
-      lenis.raf(time);
-      raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
 
     // Intercepta cliques em links de âncora para rolar suavemente até a seção.
     const onClick = (e: MouseEvent) => {
@@ -52,12 +47,17 @@ export function SmoothScroll() {
       history.pushState(null, "", href);
       target.setAttribute("tabindex", "-1");
       target.focus({ preventScroll: true });
+      // Remove o tabindex ao perder o foco — não polui o DOM nem deixa a
+      // seção num estado focável inesperado.
+      target.addEventListener("blur", () => target.removeAttribute("tabindex"), {
+        once: true,
+      });
     };
     document.addEventListener("click", onClick);
 
-    // Limpeza ao desmontar: cancela o loop, remove o listener e destrói o Lenis.
+    // Limpeza ao desmontar: remove o listener e destrói o Lenis (que para o
+    // próprio rAF interno).
     return () => {
-      cancelAnimationFrame(raf);
       document.removeEventListener("click", onClick);
       lenisRef.current = null;
       lenis.destroy();

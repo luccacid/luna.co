@@ -71,7 +71,7 @@ export function Preloader() {
       </div>
 
       {/* Slogan (um dos dois únicos textos reais do projeto) */}
-      <p className="relative mt-5 animate-[fade-up_0.6s_0.3s_both] font-mono text-[10px] uppercase tracking-tagline text-[#777]">
+      <p className="relative mt-5 animate-[fade-up_0.6s_0.3s_both] font-mono text-[10px] uppercase tracking-tagline text-[#8a8a8a]">
         Building Digital Systems
       </p>
     </div>
