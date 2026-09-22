@@ -1,12 +1,18 @@
+# Dependências e saídas de build
 /node_modules
 /.next
 /out
 /build
 *.tsbuildinfo
+
+# Ambiente
 .env*
 .DS_Store
+*.stackdump
+
+# Ferramentas locais (config de máquina, não do projeto)
+.claude/
+.omc/
 .ds-sync/
+.design-sync/
 ds-bundle/
-.design-sync/.cache/
-.design-sync/learnings/
-.design-sync/node_modules
