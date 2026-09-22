@@ -16,21 +16,16 @@ import { cn } from "@/lib/utils";
 import { lockScroll } from "@/lib/scroll-lock";
 import { LunaLockup, LunaSymbol } from "./luna-symbol";
 import { useActiveSection } from "./use-active-section";
+import { useT } from "@/lib/i18n";
+import { LangSwitch } from "./lang-switch";
 
-/** Links de navegação, na ordem das seções na página (rótulos placeholder). */
-const LINKS = [
-  { href: "#servicos", label: "Lorem" },
-  { href: "#processo", label: "Dolor" },
-  { href: "#sobre", label: "Ipsum" },
-  { href: "#contato", label: "Amet" },
-];
-
-const SECTION_IDS = LINKS.map((l) => l.href.slice(1));
+import { SECTION_IDS } from "@/lib/sections";
 
 export function SiteNav() {
   const [scrolled, setScrolled] = useState(false); // borda aparece ao rolar
   const [open, setOpen] = useState(false); // menu mobile aberto
   const active = useActiveSection(SECTION_IDS); // seção em vista (scrollspy)
+  const t = useT();
 
   const burgerRef = useRef<HTMLButtonElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
@@ -81,20 +76,20 @@ export function SiteNav() {
     <>
       <nav
         ref={navRef}
-        aria-label="Principal"
+        aria-label={t.nav.main}
         className={cn(
           "glass sticky top-0 z-nav border-b transition-colors duration-300",
           scrolled ? "border-line" : "border-transparent"
         )}
       >
         <div className="rail flex h-[66px] items-center justify-between">
-          <a href="#top" aria-label="luna&co — início">
+          <a href="#top" aria-label={t.nav.home}>
             <LunaLockup />
           </a>
 
           {/* Links — só desktop. O ponto ember marca a seção ativa. */}
           <div className="hidden items-center gap-8 font-mono text-[13px] tracking-[0.04em] text-muted-foreground md:flex">
-            {LINKS.map((l) => {
+            {t.nav.links.map((l) => {
               const isActive = active === l.href.slice(1);
               return (
                 <a
@@ -118,26 +113,31 @@ export function SiteNav() {
             })}
           </div>
 
-          {/* CTA — escondido nos celulares mais estreitos */}
-          <a
-            href="#contato"
-            className="hidden items-center gap-2 rounded-[10px] bg-ink px-[18px] py-[9px] font-mono text-[12px] font-medium tracking-[0.04em] text-paper transition-transform duration-200 hover:-translate-y-0.5 sm:inline-flex"
-          >
-            Lorem ipsum
-          </a>
+          {/* Idioma + CTA. O seletor aparece a partir de sm para não competir
+              com o hambúrguer nas telas mais estreitas (no mobile ele vive no
+              rodapé do menu). */}
+          <div className="flex items-center gap-3">
+            <LangSwitch className="hidden sm:inline-flex" />
+            <a
+              href="#contato"
+              className="hidden items-center gap-2 rounded-[10px] bg-ink px-[18px] py-[9px] font-mono text-[12px] font-medium tracking-[0.04em] text-paper transition-transform duration-200 hover:-translate-y-0.5 sm:inline-flex"
+            >
+              {t.nav.cta}
+            </a>
 
           {/* Botão hambúrguer — só mobile */}
           <button
             ref={burgerRef}
             type="button"
             onClick={() => setOpen(true)}
-            aria-label="Abrir menu"
+            aria-label={t.nav.openMenu}
             aria-expanded={open}
             aria-controls="mobile-menu"
             className="flex h-10 w-10 items-center justify-center text-ink md:hidden"
           >
             <Menu className="h-5 w-5" />
           </button>
+          </div>
         </div>
       </nav>
 
@@ -146,7 +146,7 @@ export function SiteNav() {
         id="mobile-menu"
         role="dialog"
         aria-modal="true"
-        aria-label="Menu de navegação"
+        aria-label={t.nav.menu}
         className={cn(
           "on-dark fixed inset-0 z-mobile-menu flex flex-col bg-dark text-paper transition-[opacity,visibility] duration-500 md:hidden",
           open ? "visible opacity-100" : "invisible opacity-0"
@@ -167,7 +167,7 @@ export function SiteNav() {
             ref={closeBtnRef}
             type="button"
             onClick={() => setOpen(false)}
-            aria-label="Fechar menu"
+            aria-label={t.nav.closeMenu}
             className="flex h-10 w-10 items-center justify-center"
           >
             <X className="h-5 w-5" />
@@ -175,8 +175,8 @@ export function SiteNav() {
         </div>
 
         {/* Links grandes; entram escalonados quando o menu abre */}
-        <nav aria-label="Menu" className="rail relative z-10 flex flex-1 flex-col justify-center gap-2">
-          {LINKS.map((l, i) => (
+        <nav aria-label={t.nav.menu} className="rail relative z-10 flex flex-1 flex-col justify-center gap-2">
+          {t.nav.links.map((l, i) => (
             <a
               key={l.href}
               href={l.href}
@@ -193,14 +193,15 @@ export function SiteNav() {
           ))}
         </nav>
 
-        {/* CTA de contato no rodapé do overlay */}
-        <div className="rail relative z-10 pb-10">
+        {/* Idioma + CTA de contato no rodapé do overlay */}
+        <div className="rail relative z-10 flex flex-col items-center gap-5 pb-10">
+          <LangSwitch tone="paper" />
           <a
             href="#contato"
             onClick={() => setOpen(false)}
             className="inline-flex w-full items-center justify-center rounded-full bg-paper py-4 font-mono text-[14px] tracking-[0.04em] text-ink"
           >
-            lorem@ipsum.co
+            contact@lunaco.tech
           </a>
         </div>
       </div>

@@ -41,10 +41,20 @@ npm run build    # build de produção
 | `src/components/sections.tsx` | Statement, Trust (marquee), Serviços, Sobre, Processo, CTA, Footer |
 | `src/components/reveal.tsx` | Scroll-reveal via IntersectionObserver |
 
-## Conteúdo
+## Conteúdo e idiomas
 
-Por requisito, os **únicos textos reais** são o nome **luna&co** e o slogan
-**Building Digital Systems**. Todo o resto é _Lorem Ipsum_.
+Toda a copy vive em `src/lib/i18n.tsx` (PT / EN / ES) e é lida via `useT()`.
+A troca é client-side (botões PT | EN | ES no header, com bandeira), persistida
+em `localStorage`; o HTML pré-renderizado sai em PT.
+
+## Deploy
+
+- **Hostinger (lunaco.tech)**: `npm run build` → suba o conteúdo de `out/` em
+  `public_html`. O `.htaccess` (de `public/`) cuida de 404, cache, gzip,
+  headers de segurança e redirect HTTPS/sem-www.
+- **GitHub Pages**: o workflow define `NEXT_PUBLIC_BASE_PATH=/luna.co` e
+  `NEXT_PUBLIC_SITE_URL`; sem essas variáveis o build sai pronto para a raiz
+  do domínio próprio.
 
 ## Animações (jogo de opacidade)
 

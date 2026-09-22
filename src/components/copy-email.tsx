@@ -7,8 +7,10 @@
  */
 import { useEffect, useRef, useState } from "react";
 import { Check, Copy } from "lucide-react";
+import { useT } from "@/lib/i18n";
 
 export function CopyEmail({ email }: { email: string }) {
+  const t = useT();
   const [copied, setCopied] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -38,10 +40,10 @@ export function CopyEmail({ email }: { email: string }) {
       className="inline-flex items-center gap-2 rounded-full border border-[#3a3a3a] px-5 py-3 font-mono text-[13px] tracking-[0.04em] text-[#aaa] transition-colors duration-300 hover:border-paper hover:text-paper"
     >
       {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-      {copied ? "Copiado" : "Copiar e-mail"}
+      {copied ? t.cta.copied : t.cta.copy}
       {/* Anúncio para leitores de tela, fora do fluxo visual */}
       <span aria-live="polite" className="sr-only">
-        {copied ? "E-mail copiado para a área de transferência" : ""}
+        {copied ? t.cta.copied : ""}
       </span>
     </button>
   );

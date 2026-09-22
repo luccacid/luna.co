@@ -6,13 +6,19 @@
  * declarada literalmente; tudo abaixo é interpretação. Ocupa a altura total da
  * viewport (`min-h-[100svh]`) com o EclipseField em parallax ao fundo.
  *
- * Componente de servidor — a interatividade (parallax) mora no EclipseField.
+ * Cliente por causa do dicionário de idioma (useT); o parallax continua
+ * isolado no EclipseField.
  */
+"use client";
+
 import { ArrowDown } from "lucide-react";
 import { EclipseField } from "./eclipse-field";
 import { LunaSymbol } from "./luna-symbol";
+import { useT } from "@/lib/i18n";
+import { SECTION_TOTAL } from "@/lib/sections";
 
 export function Hero() {
+  const t = useT();
   return (
     <section
       id="top"
@@ -26,10 +32,10 @@ export function Hero() {
       {/* Rótulos verticais nas margens (só em telas grandes) — decorativos,
           escondidos da AT (duplicam a marca e quebram a ordem de leitura). */}
       <span aria-hidden className="pointer-events-none absolute left-6 top-1/2 hidden -translate-y-1/2 -rotate-90 font-mono text-[11px] uppercase tracking-tagline text-[#5a5a5a] lg:block">
-        luna&amp;co — lorem ipsum
+        {t.hero.railLeft}
       </span>
       <span aria-hidden className="pointer-events-none absolute right-6 top-1/2 hidden -translate-y-1/2 rotate-90 font-mono text-[11px] uppercase tracking-tagline text-[#5a5a5a] lg:block">
-        est. mmxxvi
+        {t.hero.railRight}
       </span>
 
       {/* Lockup centralizado */}
@@ -70,22 +76,22 @@ export function Hero() {
 
         {/* Slogan (texto real permitido) */}
         <p className="mt-7 animate-fade-up font-mono text-[clamp(11px,2.2vw,16px)] uppercase tracking-tagline text-[#bdbdbd] [animation-delay:320ms]">
-          Building Digital Systems
+          {t.hero.tagline}
         </p>
       </div>
 
-      {/* Indicação de scroll, fixada na base do hero. "00 / 05" = lua nova:
-          o SectionHud assume a contagem (01–05) ao entrar no conteúdo. */}
+      {/* Indicação de scroll, fixada na base do hero. "00 / NN" = início:
+          o SectionHud assume a contagem ao entrar no conteúdo. */}
       <div className="rail relative z-10 flex items-center justify-between pb-9 font-mono text-[11px] uppercase tracking-[0.3em] text-[#8a8a8a]">
-        <span className="hidden sm:inline">Lorem — Ipsum</span>
+        <span className="hidden sm:inline">{t.hero.railLeft}</span>
         <a
           href="#manifesto"
           className="mx-auto inline-flex items-center gap-2 transition-colors hover:text-paper sm:mx-0"
         >
           <ArrowDown aria-hidden className="h-3.5 w-3.5 motion-safe:animate-bounce" />
-          Scroll
+          {t.hero.scroll}
         </a>
-        <span className="hidden sm:inline">00 / 05</span>
+        <span className="hidden sm:inline">00 / {SECTION_TOTAL}</span>
       </div>
     </section>
   );

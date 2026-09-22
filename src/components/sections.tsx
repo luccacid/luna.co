@@ -9,16 +9,17 @@
  *   - tipografia editorial em mono, layouts assimétricos;
  *   - o eclipse como motivo recorrente (não só logo);
  *   - nada de "tudo em cards" — Serviços é um índice, stats são inline.
- * Textos de corpo são placeholders (Lorem Ipsum) por requisito.
  */
+"use client";
+
 import { ArrowUpRight, Plus } from "lucide-react";
+import { useT } from "@/lib/i18n";
 import { LunaSymbol, LunaWordmark } from "./luna-symbol";
 import { Reveal } from "./reveal";
 import { PartnersEclipse } from "./partners-eclipse";
 import { Magnetic } from "./magnetic";
 import { CountUp } from "./count-up";
 import { CopyEmail } from "./copy-email";
-import { MoonToday } from "./moon-today";
 
 /* ================================================================== */
 /*  Compartilhado: rótulo de seção ("kicker")                          */
@@ -43,22 +44,23 @@ function Kicker({ children, dark = false }: { children: React.ReactNode; dark?: 
 /*  Statement — tipografia editorial gigante, a "voz" da marca         */
 /* ================================================================== */
 export function Statement() {
+  const t = useT();
   return (
     <section id="manifesto" tabIndex={-1} className="relative bg-paper py-28 md:py-40">
       <div className="rail">
         <Reveal className="mb-12">
-          <Kicker>Lorem ipsum</Kicker>
+          <Kicker>{t.statement.kicker}</Kicker>
         </Reveal>
 
         {/* Frase grande, com um trecho cinza que pulsa de opacidade */}
         <Reveal delay={80}>
           <p className="max-w-[20ch] font-mono text-[clamp(30px,6.5vw,84px)] font-medium leading-[1.04] tracking-[-0.02em] text-ink">
-            Lorem ipsum dolor{" "}
+            {t.statement.lead1}{" "}
             {/* #8a8a8a: 3.3:1 — passa AA para texto grande (o #bcbcbc reprovava) */}
             <span className="text-[#8a8a8a] [animation:pulse-dim_5s_ease-in-out_infinite]">
-              sit amet consectetur
+              {t.statement.leadAccent}
             </span>{" "}
-            adipiscing elit.
+            {t.statement.lead2}
           </p>
         </Reveal>
 
@@ -68,16 +70,14 @@ export function Statement() {
           className="mt-14 flex flex-col gap-6 border-t border-line pt-8 md:flex-row md:items-start md:justify-between"
         >
           <p className="max-w-[460px] text-[16px] text-muted-foreground">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-            minim veniam.
+            {t.statement.body}
           </p>
           <a
             href="#contato"
             className="group inline-flex shrink-0 items-center gap-3 font-mono text-[14px] tracking-[0.04em] text-ink"
           >
             <span className="relative">
-              Lorem ipsum dolor
+              {t.statement.cta}
               <span className="absolute -bottom-1 left-0 h-px w-full origin-right scale-x-0 bg-ink transition-transform duration-300 group-hover:origin-left group-hover:scale-x-100" />
             </span>
             {/* Botão circular com efeito magnético */}
@@ -96,20 +96,15 @@ export function Statement() {
 /* ================================================================== */
 /*  TrustBar — faixa marquee infinita (sem caixas)                     */
 /* ================================================================== */
-const MARQUEE_WORDS = ["LOREM", "IPSUM", "DOLOR", "SIT AMET", "CONSECTETUR", "ADIPISCING", "ELIT"];
+
 
 /**
- * Sequência expandida do marquee, computada UMA vez no carregamento do módulo
- * (não a cada render de cada grupo). A lista é repetida 2× para que um único
- * grupo fique mais largo que viewports comuns; como a faixa usa dois grupos
+ * Um "grupo" do marquee. A lista chega repetida 2× para que um único grupo
+ * fique mais largo que viewports comuns; como a faixa usa dois grupos
  * idênticos e anima `translateX(-50%)`, o grupo 2 cai exatamente onde o grupo 1
  * começou — loop contínuo, sem buraco.
  */
-const MARQUEE_SEQ = Array.from({ length: 2 }).flatMap(() => MARQUEE_WORDS);
-
-/** Um "grupo" do marquee — renderiza a sequência pré-computada. */
-function MarqueeGroup() {
-  const seq = MARQUEE_SEQ;
+function MarqueeGroup({ seq }: { seq: readonly string[] }) {
   return (
     <div aria-hidden className="flex shrink-0 items-center">
       {seq.map((w, i) => (
@@ -127,11 +122,12 @@ function MarqueeGroup() {
 }
 
 export function TrustBar() {
+  const seq = [...useT().marquee, ...useT().marquee];
   return (
     <div aria-hidden className="marquee-mask overflow-hidden border-y border-line bg-paper py-7">
       <div className="marquee-track">
-        <MarqueeGroup />
-        <MarqueeGroup />
+        <MarqueeGroup seq={seq} />
+        <MarqueeGroup seq={seq} />
       </div>
     </div>
   );
@@ -140,43 +136,21 @@ export function TrustBar() {
 /* ================================================================== */
 /*  Services — índice editorial, linhas full-width, invert no hover    */
 /* ================================================================== */
-const SERVICES = [
-  {
-    title: "Lorem ipsum dolor",
-    body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.",
-    tags: "Lorem · Ipsum · Dolor",
-  },
-  {
-    title: "Consectetur elit",
-    body: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip.",
-    tags: "Amet · Sit · Elit",
-  },
-  {
-    title: "Tempor incididunt",
-    body: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat.",
-    tags: "Magna · Aliqua · Veniam",
-  },
-  {
-    title: "Officia deserunt",
-    body: "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit.",
-    tags: "Cloud · Nisi · Anim",
-  },
-];
-
 export function Services() {
+  const t = useT();
+  const SERVICES = t.services.items;
   return (
     <section id="servicos" className="py-28">
       <div className="rail">
         <Reveal className="mb-16 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <Kicker>Lorem ipsum</Kicker>
+            <Kicker>{t.services.kicker}</Kicker>
             <h2 className="mt-5 font-mono text-[clamp(34px,5vw,56px)] font-medium leading-[1.02] tracking-[-0.02em] text-ink">
-              Lorem ipsum
+              {t.services.title}
             </h2>
           </div>
           <p className="max-w-[360px] text-[16px] text-muted-foreground">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore.
+            {t.services.intro}
           </p>
         </Reveal>
 
@@ -239,28 +213,29 @@ export function Services() {
  * Estatísticas. Quando `count` existe, o número é animado (CountUp); caso
  * contrário usa-se o texto fixo `n` (ex.: símbolos "01", "∞").
  */
-const STATS: { n?: string; count?: number; suffix?: string; l: string }[] = [
-  { n: "01", l: "Lorem" },
-  { count: 100, suffix: "%", l: "Ipsum dolor" },
-  { n: "∞", l: "Sit amet" },
-  { count: 24, suffix: "/7", l: "Consectetur" },
+/** Valores das estatísticas; os rótulos vêm do dicionário, na mesma ordem. */
+const STATS: { n?: string; count?: number; suffix?: string }[] = [
+  { n: "01" },
+  { count: 100, suffix: "%" },
+  { n: "R$" },
+  { n: "+" },
 ];
 
 export function About() {
+  const t = useT();
   return (
     <section id="sobre" className="on-dark bg-dark py-28 text-paper">
       <div className="rail">
         <Reveal className="mb-16 max-w-[640px]">
-          <Kicker dark>Lorem ipsum</Kicker>
+          <Kicker dark>{t.about.kicker}</Kicker>
           <h2 className="mt-5 font-mono text-[clamp(30px,4.4vw,52px)] font-medium leading-[1.06] tracking-[-0.02em]">
-            Lorem ipsum dolor sit,
+            {t.about.title1}
             <br />
             {/* #6b6b6b: 3.45:1 — passa AA para texto grande sobre #141414 */}
-            <span className="text-[#6b6b6b]">amet consectetur.</span>
+            <span className="text-[#6b6b6b]">{t.about.title2}</span>
           </h2>
           <p className="mt-5 max-w-[460px] text-[16px] text-[#aaa]">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna.
+            {t.about.body}
           </p>
         </Reveal>
 
@@ -275,8 +250,8 @@ export function About() {
             o visual ficar idêntico ao layout anterior. */}
         <Reveal delay={160}>
           <dl className="mt-20 grid grid-cols-2 divide-x divide-[#2a2a2a] border-t border-[#2a2a2a] md:grid-cols-4">
-            {STATS.map((s) => (
-              <div key={s.l} className="px-6 py-8 first:pl-0">
+            {STATS.map((s, i) => (
+              <div key={t.about.stats[i]} className="px-6 py-8 first:pl-0">
                 <dd className="font-mono text-[clamp(36px,5vw,56px)] font-medium leading-none text-white">
                   {s.count !== undefined ? (
                     <CountUp value={s.count} suffix={s.suffix} />
@@ -285,7 +260,7 @@ export function About() {
                   )}
                 </dd>
                 <dt className="mt-3 font-mono text-[12px] uppercase tracking-[0.18em] text-[#888]">
-                  {s.l}
+                  {t.about.stats[i]}
                 </dt>
               </div>
             ))}
@@ -299,19 +274,15 @@ export function About() {
 /* ================================================================== */
 /*  Process — fases da lua: a luz viaja da nova → cheia                */
 /* ================================================================== */
-const STEPS = [
-  { title: "Lorem", body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit." },
-  { title: "Ipsum", body: "Sed do eiusmod tempor incididunt ut labore et dolore." },
-  { title: "Dolor", body: "Ut enim ad minim veniam, quis nostrud exercitation." },
-  { title: "Amet", body: "Duis aute irure dolor in reprehenderit in voluptate velit." },
-];
+/** Quantidade de etapas — o conteúdo vem do dicionário. */
+const STEP_COUNT = 4;
 
 /**
  * Mini-lua de cada etapa. A opacidade cresce a cada passo (0.28 → 0.92),
  * representando o eclipse "se enchendo de luz" ao longo do processo.
  */
 function MoonPhase({ step }: { step: number }) {
-  const op = 0.28 + (step / (STEPS.length - 1)) * 0.64;
+  const op = 0.28 + (step / (STEP_COUNT - 1)) * 0.64;
   return (
     <svg viewBox="0 0 48 48" className="h-9 w-9">
       <circle cx="24" cy="24" r="22" fill="none" stroke="#1a1a1a" strokeOpacity="0.18" />
@@ -321,13 +292,15 @@ function MoonPhase({ step }: { step: number }) {
 }
 
 export function Process() {
+  const t = useT();
+  const STEPS = t.process.steps;
   return (
     <section id="processo" className="py-28">
       <div className="rail">
         <Reveal className="mb-16">
-          <Kicker>Dolor sit amet</Kicker>
+          <Kicker>{t.process.kicker}</Kicker>
           <h2 className="mt-5 font-mono text-[clamp(34px,5vw,56px)] font-medium leading-[1.02] tracking-[-0.02em] text-ink">
-            Lorem ipsum
+            {t.process.title}
           </h2>
         </Reveal>
 
@@ -359,6 +332,7 @@ export function Process() {
 /*  FinalCta — full-bleed, eclipse gigante ao fundo                    */
 /* ================================================================== */
 export function FinalCta() {
+  const t = useT();
   return (
     <section id="contato" className="on-dark relative overflow-hidden bg-dark py-32 text-paper">
       <div className="starfield pointer-events-none absolute inset-0 [animation:twinkle_11s_ease-in-out_infinite]" />
@@ -387,27 +361,26 @@ export function FinalCta() {
             <LunaSymbol tone="paper" animated />
           </div>
           <h2 className="mx-auto max-w-[16ch] font-mono text-[clamp(30px,5vw,60px)] font-medium leading-[1.02] tracking-[-0.02em]">
-            Lorem ipsum dolor sit amet?
+            {t.cta.title}
           </h2>
           <p className="mx-auto mt-5 max-w-[440px] text-[16px] text-[#aaa]">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt.
+            {t.cta.body}
           </p>
 
           {/* Pill de contato (mailto) + botão copiar — duas rotas, zero atrito */}
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <Magnetic strength={0.35}>
               <a
-                href="mailto:lorem@ipsum.co"
+                href="mailto:contact@lunaco.tech"
                 className="group inline-flex items-center gap-3 rounded-full border border-[#3a3a3a] py-3.5 pl-7 pr-3.5 font-mono text-[14px] tracking-[0.04em] text-paper transition-colors duration-300 hover:border-paper"
               >
-                lorem@ipsum.co
+                contact@lunaco.tech
                 <span className="flex h-9 w-9 items-center justify-center rounded-full bg-paper text-ink transition-transform duration-300 group-hover:rotate-45">
                   <ArrowUpRight className="h-4 w-4" />
                 </span>
               </a>
             </Magnetic>
-            <CopyEmail email="lorem@ipsum.co" />
+            <CopyEmail email="contact@lunaco.tech" />
           </div>
         </Reveal>
       </div>
@@ -419,6 +392,7 @@ export function FinalCta() {
 /*  Footer                                                             */
 /* ================================================================== */
 export function SiteFooter() {
+  const t = useT();
   return (
     <footer className="on-dark border-t border-[#262626] bg-dark py-16 text-[#888]">
       <div className="rail">
@@ -432,19 +406,16 @@ export function SiteFooter() {
 
         <div className="flex flex-wrap items-start justify-between gap-10 border-t border-[#262626] pt-10">
           <p className="max-w-[280px] text-[14px] text-[#888]">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor.
+            {t.footer.blurb}
           </p>
 
           {/* Colunas de links (rótulos placeholder) */}
           <div className="flex flex-wrap gap-x-16 gap-y-8 font-mono text-[13px]">
             <div>
-              <p className="mb-3.5 font-medium tracking-[0.04em] text-[#ccc]">LOREM</p>
-              {[
-                { href: "#sobre", label: "Ipsum" },
-                { href: "#servicos", label: "Dolor" },
-                { href: "#processo", label: "Amet" },
-              ].map((l) => (
+              <p className="mb-3.5 font-medium tracking-[0.04em] text-[#ccc]">
+                {t.footer.navTitle}
+              </p>
+              {t.nav.links.slice(0, 3).map((l) => (
                 <a
                   key={l.href}
                   href={l.href}
@@ -455,15 +426,17 @@ export function SiteFooter() {
               ))}
             </div>
             <div>
-              <p className="mb-3.5 font-medium tracking-[0.04em] text-[#ccc]">DOLOR</p>
+              <p className="mb-3.5 font-medium tracking-[0.04em] text-[#ccc]">
+                {t.footer.contactTitle}
+              </p>
               <a
-                href="mailto:lorem@ipsum.co"
+                href="mailto:contact@lunaco.tech"
                 className="mb-2.5 block text-[#888] transition-colors hover:text-white"
               >
-                lorem@ipsum.co
+                contact@lunaco.tech
               </a>
               <a href="#top" className="mb-2.5 block text-[#888] transition-colors hover:text-white">
-                ipsum.co
+                lunaco.tech
               </a>
             </div>
           </div>
@@ -473,8 +446,7 @@ export function SiteFooter() {
             #8a8a8a no lugar de #666: 12px precisa de 4.5:1 sobre #141414. */}
         <div className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-[#262626] pt-6 font-mono text-[12px] tracking-[0.04em] text-[#8a8a8a]">
           <span>© 2026 luna&amp;co</span>
-          <MoonToday />
-          <span>LOREM · IPSUM · DOLOR</span>
+          <span>BUILDING DIGITAL SYSTEMS</span>
         </div>
       </div>
     </footer>

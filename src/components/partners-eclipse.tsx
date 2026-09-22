@@ -7,22 +7,19 @@
  * luz cheia e apaga as outras — a ideia de "partes que formam um sistema" vira
  * algo que se sente, não só se lê. É novamente um jogo de opacidade.
  *
- * Obs.: os textos são placeholders (Lorem/Dolor/Consectetur) por requisito.
  */
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useT } from "@/lib/i18n";
 
-/** Itens do eclipse. `cx` posiciona cada lua no eixo X do SVG. */
-const PARTNERS = [
-  { name: "Lorem", role: "Ipsum", cx: 230 },
-  { name: "Dolor", role: "Amet", cx: 300 },
-  { name: "Consectetur", role: "Elit", cx: 370 },
-] as const;
+/** Posição de cada disco no eixo X do SVG; nome e papel vêm do dicionário. */
+const CX = [230, 300, 370] as const;
 
 /** Opacidades de repouso — o eclipse canônico (1 > 2 > 3). */
 const REST = [0.92, 0.55, 0.28];
 
 export function PartnersEclipse() {
+  const PARTNERS = useT().about.pillars;
   // Índice do item ativo (com hover/foco); `null` = estado de repouso.
   const [active, setActive] = useState<number | null>(null);
 
@@ -46,11 +43,15 @@ export function PartnersEclipse() {
               onFocus={() => setActive(i)}
               onBlur={() => setActive(null)}
               className={cn(
-                "group flex w-full items-baseline justify-between border-b border-[#2a2a2a] py-6 text-left transition-colors duration-300",
+                // Nome em cima, papel embaixo: em mono o nome é uma palavra só,
+                // sem espaço para quebrar — lado a lado ele estoura a caixa em
+                // PT/ES. Empilhado, cabe em qualquer idioma e as três linhas
+                // ficam iguais.
+                "group flex w-full flex-col gap-1.5 border-b border-[#2a2a2a] py-6 text-left transition-colors duration-300",
                 active === i ? "border-paper/40" : "hover:border-[#3d3d3d]"
               )}
             >
-              <span className="flex items-baseline gap-5">
+              <span className="flex shrink-0 items-baseline gap-5">
                 {/* #8a8a8a: 5.3:1 sobre #141414 — o antigo #666 reprovava em AA */}
                 <span className="font-mono text-[13px] text-[#8a8a8a]">0{i + 1}</span>
                 <span
@@ -90,7 +91,7 @@ export function PartnersEclipse() {
           {PARTNERS.map((p, i) => (
             <circle
               key={p.name}
-              cx={p.cx}
+              cx={CX[i]}
               cy="300"
               r="120"
               fill="#fafafa"

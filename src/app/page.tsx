@@ -24,6 +24,7 @@ import {
   FinalCta,
   SiteFooter,
 } from "@/components/sections";
+import { Cases, Stack, Pricing, Faq } from "@/components/sections-sell";
 
 export default function Home() {
   return (
@@ -38,8 +39,12 @@ export default function Home() {
         <Statement />
         <TrustBar />
         <Services />
+        <Cases />
+        <Stack />
         <Process />
+        <Pricing />
         <About />
+        <Faq />
         <FinalCta />
       </main>
 

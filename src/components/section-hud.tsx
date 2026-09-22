@@ -2,29 +2,21 @@
 
 /**
  * <SectionHud> — contador de "capítulos" fixo no canto inferior esquerdo,
- * espelhando o ScrollMoon à direita. Fecha a promessa do "00 / 05" do hero:
+ * espelhando o ScrollMoon à direita. Fecha a promessa do "00 / NN" do hero:
  * a página inteira passa a ter senso de posição.
  *
  * `mix-blend-difference` + texto papel = legível sobre qualquer fundo
  * (escuro vira claro, claro vira escuro) sem lógica de tema.
- * Rótulos são placeholders por requisito do projeto.
  */
 import { cn } from "@/lib/utils";
 import { useActiveSection } from "./use-active-section";
-
-const SECTIONS = [
-  { id: "manifesto", label: "Sit" },
-  { id: "servicos", label: "Lorem" },
-  { id: "processo", label: "Dolor" },
-  { id: "sobre", label: "Ipsum" },
-  { id: "contato", label: "Amet" },
-] as const;
-
-const IDS = SECTIONS.map((s) => s.id);
+import { useT } from "@/lib/i18n";
+import { SECTION_IDS as IDS, SECTION_TOTAL } from "@/lib/sections";
 
 export function SectionHud() {
+  const t = useT();
   const active = useActiveSection(IDS);
-  const idx = SECTIONS.findIndex((s) => s.id === active);
+  const idx = active ? IDS.indexOf(active) : -1;
 
   return (
     <div
@@ -35,8 +27,10 @@ export function SectionHud() {
         idx === -1 ? "opacity-0" : "opacity-100"
       )}
     >
-      <span>{idx === -1 ? "00" : `0${idx + 1}`} / 05</span>
-      <span className="opacity-60">{idx === -1 ? "" : SECTIONS[idx].label}</span>
+      <span>
+        {idx === -1 ? "00" : String(idx + 1).padStart(2, "0")} / {SECTION_TOTAL}
+      </span>
+      <span className="opacity-60">{idx === -1 ? "" : t.hud[idx]}</span>
     </div>
   );
 }

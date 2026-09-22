@@ -12,30 +12,33 @@ import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { Preloader } from "@/components/preloader";
-import { MoonCursor } from "@/components/moon-cursor";
+import { LangProvider } from "@/lib/i18n";
+import { SkipLink } from "@/components/skip-link";
 
 /**
  * Metadados da página. Por requisito do projeto, os únicos textos reais são o
  * nome "luna&co" e o slogan "Building Digital Systems".
  */
+/**
+ * Origem canônica do site. Domínio próprio (Hostinger) por padrão; o CI do
+ * GitHub Pages sobrescreve via env para manter OG/canonical corretos lá.
+ */
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://lunaco.tech";
+
 export const metadata: Metadata = {
-  // Origem real do deploy (GitHub Pages). basePath /luna.co é aplicado pelo
-  // Next ao montar URLs absolutas de OG/canonical. Trocar por domínio próprio
-  // quando houver.
-  metadataBase: new URL("https://luccacid.github.io/luna.co"),
+  metadataBase: new URL(SITE_URL),
   title: "luna&co — Building Digital Systems",
   description:
     "luna&co — a digital systems studio. Building Digital Systems.",
-  // basePath não é aplicado a metadata.icons no export estático — prefixo
-  // manual p/ não dar 404 em /luna.co. ponytail: remover o /luna.co ao migrar
-  // para domínio próprio. SVG cobre browsers modernos; .ico = fallback legado;
-  // apple-touch = ícone de home screen no iOS.
+  // basePath não é aplicado a metadata.icons no export estático — prefixo manual.
+  // SVG cobre browsers modernos; .ico = fallback legado; apple-touch = iOS.
   icons: {
     icon: [
-      { url: "/luna.co/favicon.svg", type: "image/svg+xml" },
-      { url: "/luna.co/favicon.ico", sizes: "32x32" },
+      { url: `${BASE_PATH}/favicon.svg`, type: "image/svg+xml" },
+      { url: `${BASE_PATH}/favicon.ico`, sizes: "32x32" },
     ],
-    apple: "/luna.co/apple-touch-icon.png",
+    apple: `${BASE_PATH}/apple-touch-icon.png`,
   },
   alternates: { canonical: "/" },
   openGraph: {
@@ -87,25 +90,20 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "Organization",
               name: "luna&co",
-              url: "https://luccacid.github.io/luna.co/",
-              logo: "https://luccacid.github.io/luna.co/favicon.svg",
+              url: `${SITE_URL}/`,
+              logo: `${SITE_URL}${BASE_PATH}/favicon.svg`,
               description: "Building Digital Systems",
             }),
           }}
         />
-        {/* Atalho de teclado: pula a nav direto para o conteúdo */}
-        <a
-          href="#manifesto"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[130] focus:rounded-md focus:bg-ink focus:px-4 focus:py-2 focus:font-mono focus:text-[13px] focus:text-paper"
-        >
-          Pular para o conteúdo
-        </a>
-        <Preloader />
-        <SmoothScroll />
-        <MoonCursor />
-        {/* Grão decorativo: fixo, sem captura de clique (pointer-events: none) */}
-        <div className="grain" aria-hidden />
-        {children}
+        <LangProvider>
+          <SkipLink />
+          <Preloader />
+          <SmoothScroll />
+          {/* Grão decorativo: fixo, sem captura de clique (pointer-events: none) */}
+          <div className="grain" aria-hidden />
+          {children}
+        </LangProvider>
       </body>
     </html>
   );
