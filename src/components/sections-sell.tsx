@@ -6,24 +6,9 @@
  * Moram fora de `sections.tsx` só para aquele arquivo continuar navegável —
  * a linguagem visual é a mesma (índice editorial, filetes, zero cards).
  */
-import { Plus } from "lucide-react";
 import { Reveal } from "./reveal";
+import { Kicker } from "./sections";
 import { useT } from "@/lib/i18n";
-
-/** Mesmo rótulo de seção do `sections.tsx`; duplicado aqui para não exportar
- *  um componente interno só por causa disso. */
-function Kicker({ children, dark = false }: { children: React.ReactNode; dark?: boolean }) {
-  return (
-    <span
-      className={`inline-flex items-center gap-2.5 font-mono text-[12px] uppercase tracking-[0.28em] ${
-        dark ? "text-[#8a8a8a]" : "text-[#6b6b6b]"
-      }`}
-    >
-      <Plus className="h-3 w-3" strokeWidth={2} aria-hidden />
-      {children}
-    </span>
-  );
-}
 
 /* ================================================================== */
 /*  Cases — setor / desafio / o que construímos                        */

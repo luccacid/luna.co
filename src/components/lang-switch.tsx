@@ -1,19 +1,33 @@
 "use client";
 
 /**
- * <LangSwitch> — três botões (PT | EN | ES) com a bandeira correspondente.
+ * <LangSwitch> — PT | EN | ES com a bandeira correspondente.
+ *
+ * São LINKS, não botões: o idioma é a rota (`/`, `/en`, `/es`), então trocar
+ * de idioma é navegar. Ganha de graça o "abrir em nova aba", o botão voltar e
+ * um destino que o buscador consegue seguir.
+ *
+ * `<a>` puro, e não `next/link`: o roteador do cliente tenta buscar segmentos
+ * RSC que o export estático não gera (três 404 por página, só de prefetch) e
+ * trocar de idioma tem de recarregar o documento para valerem o `<html lang>`
+ * e a metadata daquele idioma. Navegação rara, recarga inteira, zero 404.
  *
  * Bandeiras em SVG inline (BR, Reino Unido, Espanha): três arquivos a menos
  * para carregar e nada de emoji, que o Windows não renderiza como bandeira.
- * São decorativas (aria-hidden) — quem anuncia o idioma é o texto do botão.
+ * São decorativas (aria-hidden) — quem anuncia o idioma é o texto do link.
  */
-import { LANGS, useLang, useT, type Lang } from "@/lib/i18n";
+import { LANGS, langPath, type Lang } from "@/lib/langs";
+import { basePath } from "@/lib/site-url";
+import { useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 const LABEL: Record<Lang, string> = { pt: "PT", en: "EN", es: "ES" };
 
 /** Nome do idioma por extenso, no próprio idioma — vai no aria-label. */
 const NAME: Record<Lang, string> = { pt: "Português", en: "English", es: "Español" };
+
+/** Código hreflang de cada idioma — usado no atributo `hrefLang` do link. */
+const HREFLANG: Record<Lang, string> = { pt: "pt-BR", en: "en", es: "es" };
 
 function Flag({ lang }: { lang: Lang }) {
   const common = "h-3 w-[18px] shrink-0 rounded-[1px]";
@@ -53,13 +67,11 @@ export function LangSwitch({
   tone?: "ink" | "paper";
   className?: string;
 }) {
-  const { lang, setLang } = useLang();
   const t = useT();
   const dark = tone === "paper";
 
   return (
-    <div
-      role="group"
+    <nav
       aria-label={t.nav.language}
       className={cn(
         "inline-flex items-center rounded-full border p-0.5 font-mono text-[12px] tracking-[0.08em]",
@@ -67,26 +79,30 @@ export function LangSwitch({
         className,
       )}
     >
-      {LANGS.map((l) => (
-        <button
-          key={l}
-          type="button"
-          onClick={() => setLang(l)}
-          aria-label={NAME[l]}
-          aria-current={l === lang ? "true" : undefined}
-          className={cn(
-            "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 transition-colors duration-200",
-            l === lang
-              ? dark
-                ? "bg-paper text-ink"
-                : "bg-ink text-paper"
-              : "opacity-55 hover:opacity-100",
-          )}
-        >
-          <Flag lang={l} />
-          {LABEL[l]}
-        </button>
-      ))}
-    </div>
+      {LANGS.map((l) => {
+        const isCurrent = l === t.lang;
+        return (
+          <a
+            key={l}
+            // basePath na mão: sem next/link, ninguém prefixa por nós.
+            href={`${basePath}${langPath(l)}/`}
+            hrefLang={HREFLANG[l]}
+            aria-label={NAME[l]}
+            aria-current={isCurrent ? "true" : undefined}
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 transition-colors duration-200",
+              isCurrent
+                ? dark
+                  ? "bg-paper text-ink"
+                  : "bg-ink text-paper"
+                : "opacity-55 hover:opacity-100",
+            )}
+          >
+            <Flag lang={l} />
+            {LABEL[l]}
+          </a>
+        );
+      })}
+    </nav>
   );
 }

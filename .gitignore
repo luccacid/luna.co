@@ -5,8 +5,9 @@
 /build
 *.tsbuildinfo
 
-# Ambiente
+# Ambiente (o .env.example é documentação: vai versionado)
 .env*
+!.env.example
 .DS_Store
 *.stackdump
 

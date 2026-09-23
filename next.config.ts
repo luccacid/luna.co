@@ -14,6 +14,9 @@ const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 const nextConfig: NextConfig = {
   output: "export",
+  // Cada rota vira <rota>/index.html — resolve em qualquer host estático
+  // (Apache da Hostinger incluso), sem depender de clean URLs do servidor.
+  trailingSlash: true,
   ...(basePath && { basePath, assetPrefix: `${basePath}/` }),
   images: { unoptimized: true },
   productionBrowserSourceMaps: false,

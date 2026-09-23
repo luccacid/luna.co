@@ -22,29 +22,15 @@
        cor. */
     --background: 0 0% 98%;      /* papel  #fafafa */
     --foreground: 0 0% 10%;      /* tinta  #1a1a1a */
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 10%;
-    --primary: 0 0% 10%;         /* tinta como ação primária */
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 10%;
     --muted: 0 0% 94%;
     --muted-foreground: 0 0% 40%;   /* #666 — texto secundário */
-    --accent: 0 0% 96%;
-    --accent-foreground: 0 0% 10%;
     --border: 0 0% 92.5%;           /* #ececec — filetes */
-    --input: 0 0% 92.5%;
-    --ring: 0 0% 10%;
-    --radius: 0.75rem;
 
     /* Cores cruas referenciadas direto nas seções escuras (hero/about/footer) */
     --ink: #1a1a1a;
     --paper: #fafafa;
     --dark: #141414;
-    --dark-2: #1c1c1c;
     --line: #ececec;
-    --muted-ink: #666666;
-    --muted-ink-d: #999999;
 
     /* Acento "ember" — a cor da lua em eclipse total. Aparece apenas em
        estados vivos (seleção, seção ativa, ponto orbital): <1% da página. */
@@ -61,9 +47,6 @@
 }
 
 @layer base {
-  html.intro-pending {
-    overflow: hidden;
-  }
   html.intro-seen .preloader {
     display: none;
   }
@@ -359,9 +342,6 @@ html.lenis body {
    Zera scroll-behavior, neutraliza o reveal e "congela" todas as animações
    e transições (duração ~0). Cobre inclusive as animações por valor arbitrário. */
 @media (prefers-reduced-motion: reduce) {
-  .preloader {
-    animation-delay: 100ms !important;
-  }
   * {
     scroll-behavior: auto !important;
   }

@@ -3,14 +3,18 @@
 /**
  * <Preloader> — intro de eclipse exibida na primeira carga.
  *
- * Uma cortina escura cobre a tela: o símbolo "sobe", uma barra de progresso se
- * preenche e o slogan aparece; em seguida a cortina sobe (translate-y) e revela
- * a página. Roda na primeira visita da aba. Sob `prefers-reduced-motion`, vira
- * apenas um piscar curto. O scroll fica travado enquanto a cortina está no ar.
+ * Uma cortina escura cobre a tela por ~600ms no total: o símbolo "sobe", a
+ * barra se preenche e a cortina sai, revelando a página. Roda na primeira
+ * visita da aba. Sob `prefers-reduced-motion`, vira apenas um piscar curto.
+ *
+ * ponytail: 600ms é o teto. Era 1,7s + trava de scroll por timer no <html> —
+ * tempo cobrado do tráfego frio para mostrar um logo que já está no topo da
+ * página. A trava agora vive com o componente e sai junto com ele.
  */
 import { useEffect, useRef, useState } from "react";
 import { LunaSymbol } from "./luna-symbol";
 import { lockScroll } from "@/lib/scroll-lock";
+import { makeSiblingsInert } from "@/lib/inert";
 
 export function Preloader() {
   const ref = useRef<HTMLDivElement>(null);
@@ -34,24 +38,17 @@ export function Preloader() {
     }
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const started = Number(document.documentElement.dataset.introStarted);
-    const elapsed = Number.isFinite(started) ? performance.now() - started : 0;
-    const remaining = (ms: number) => Math.max(0, ms - elapsed);
-    const hold = remaining(reduced ? 100 : 1100);
-    const done = remaining(reduced ? 100 : 1700);
+    const hold = reduced ? 80 : 320;
+    const done = reduced ? 100 : 600;
 
     // Trava a rolagem (overflow + Lenis) enquanto a intro está visível.
     lockScroll("preloader", true);
-    const overlay = ref.current;
-    const outside = Array.from(document.body.children)
-      .filter((el) => el !== overlay && !el.contains(overlay))
-      .map((el) => ({ el: el as HTMLElement, inert: (el as HTMLElement).inert }));
-    outside.forEach(({ el }) => { el.inert = true; });
+    const restoreInert = makeSiblingsInert(ref.current);
     let released = false;
     const release = () => {
       if (released) return;
       released = true;
-      outside.forEach(({ el, inert }) => { el.inert = inert; });
+      restoreInert();
       lockScroll("preloader", false);
     };
 
@@ -76,7 +73,7 @@ export function Preloader() {
     <div
       ref={ref}
       aria-hidden
-      className={`preloader fixed inset-0 z-preloader flex flex-col items-center justify-center bg-dark transition-[opacity,transform] duration-[600ms] ease-[cubic-bezier(0.76,0,0.24,1)] ${
+      className={`preloader fixed inset-0 z-preloader flex flex-col items-center justify-center bg-dark transition-[opacity,transform] duration-300 ease-[cubic-bezier(0.76,0,0.24,1)] ${
         leaving ? "pointer-events-none -translate-y-full opacity-0" : "opacity-100"
       }`}
     >
@@ -84,19 +81,15 @@ export function Preloader() {
       <div className="starfield pointer-events-none absolute inset-0 opacity-50" />
 
       {/* Símbolo da marca subindo na entrada */}
-      <div className="relative h-20 w-[150px] animate-[intro-rise_0.9s_cubic-bezier(0.16,1,0.3,1)_both]">
+      <div className="relative h-20 w-[150px] animate-[intro-rise_0.35s_cubic-bezier(0.16,1,0.3,1)_both]">
         <LunaSymbol tone="paper" animated />
       </div>
 
       {/* Barra de progresso que se preenche durante o `hold` */}
       <div className="relative mt-9 h-px w-[180px] overflow-hidden bg-white/12">
-        <span className="absolute inset-y-0 left-0 w-full origin-left animate-[intro-bar_1.1s_ease-out_both] bg-paper/70" />
+        <span className="absolute inset-y-0 left-0 w-full origin-left animate-[intro-bar_0.32s_ease-out_both] bg-paper/70" />
       </div>
 
-      {/* Slogan da marca */}
-      <p className="relative mt-5 animate-[fade-up_0.6s_0.3s_both] font-mono text-[10px] uppercase tracking-tagline text-[#8a8a8a]">
-        Building Digital Systems
-      </p>
     </div>
   );
 }

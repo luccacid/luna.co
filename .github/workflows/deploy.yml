@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy
 
 on:
   push:
@@ -15,24 +15,25 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # ---- GitHub Pages (espelho, sob /luna.co) --------------------------------
   build:
     runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_BASE_PATH: /luna.co
+      NEXT_PUBLIC_SITE_URL: https://luccacid.github.io
+      NEXT_PUBLIC_WHATSAPP: ${{ vars.NEXT_PUBLIC_WHATSAPP }}
+      NEXT_PUBLIC_FORM_ENDPOINT: ${{ vars.NEXT_PUBLIC_FORM_ENDPOINT }}
+      NEXT_PUBLIC_ANALYTICS_DOMAIN: ${{ vars.NEXT_PUBLIC_ANALYTICS_DOMAIN }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
       - run: npm ci
       - run: npm run lint
       - run: npm run build
-        env:
-          NEXT_PUBLIC_BASE_PATH: /luna.co
-          NEXT_PUBLIC_SITE_URL: https://luccacid.github.io
       - run: npm run check:export
-        env:
-          NEXT_PUBLIC_BASE_PATH: /luna.co
-          NEXT_PUBLIC_SITE_URL: https://luccacid.github.io
       - uses: actions/upload-pages-artifact@v3
         with:
           path: ./out
@@ -46,3 +47,35 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  # ---- lunaco.tech (produção de verdade) -----------------------------------
+  # Antes este host subia por zip na mão, sem lint, sem build verificado e sem
+  # o check:export — justo o ambiente que importa era o único sem rede de
+  # proteção. Fica desligado até `vars.DEPLOY_HOSTINGER` valer "true" e os
+  # segredos de FTP existirem.
+  hostinger:
+    if: ${{ vars.DEPLOY_HOSTINGER == 'true' }}
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SITE_URL: https://lunaco.tech
+      NEXT_PUBLIC_WHATSAPP: ${{ vars.NEXT_PUBLIC_WHATSAPP }}
+      NEXT_PUBLIC_FORM_ENDPOINT: ${{ vars.NEXT_PUBLIC_FORM_ENDPOINT }}
+      NEXT_PUBLIC_ANALYTICS_DOMAIN: ${{ vars.NEXT_PUBLIC_ANALYTICS_DOMAIN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - run: npm run check:export
+      - name: Publicar em public_html via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./out/
+          server-dir: public_html/

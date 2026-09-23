@@ -14,10 +14,12 @@ import { useEffect, useRef, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { lockScroll } from "@/lib/scroll-lock";
+import { makeSiblingsInert } from "@/lib/inert";
 import { LunaLockup, LunaSymbol } from "./luna-symbol";
 import { useActiveSection } from "./use-active-section";
 import { useT } from "@/lib/i18n";
 import { LangSwitch } from "./lang-switch";
+import { EMAIL } from "@/lib/contact";
 
 import { SECTION_IDS } from "@/lib/sections";
 
@@ -30,7 +32,6 @@ export function SiteNav() {
   const burgerRef = useRef<HTMLButtonElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-  const navRef = useRef<HTMLElement>(null);
   const restoreFocusRef = useRef(true);
 
   // Observa o scroll para alternar a borda da barra.
@@ -54,10 +55,7 @@ export function SiteNav() {
     const menu = menuRef.current;
     if (!menu) return;
     const burger = burgerRef.current;
-    const outside = Array.from(document.body.children)
-      .filter((el) => el !== menu && !el.contains(menu))
-      .map((el) => ({ el: el as HTMLElement, inert: (el as HTMLElement).inert }));
-    outside.forEach(({ el }) => { el.inert = true; });
+    const restoreInert = makeSiblingsInert(menu);
     const frame = requestAnimationFrame(() => closeBtnRef.current?.focus());
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -79,7 +77,7 @@ export function SiteNav() {
     return () => {
       cancelAnimationFrame(frame);
       window.removeEventListener("keydown", onKey);
-      outside.forEach(({ el, inert }) => { el.inert = inert; });
+      restoreInert();
       if (restoreFocusRef.current) {
         requestAnimationFrame(() => burger?.focus({ preventScroll: true }));
       }
@@ -89,7 +87,6 @@ export function SiteNav() {
   return (
     <>
       <nav
-        ref={navRef}
         aria-label={t.nav.main}
         className={cn(
           "glass sticky top-0 z-nav border-b transition-colors duration-300",
@@ -224,7 +221,7 @@ export function SiteNav() {
             }}
             className="inline-flex w-full items-center justify-center rounded-full bg-paper py-4 font-mono text-[14px] tracking-[0.04em] text-ink"
           >
-            contact@lunaco.tech
+            {EMAIL}
           </a>
         </div>
       </div>

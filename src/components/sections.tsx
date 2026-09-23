@@ -12,22 +12,25 @@
  */
 "use client";
 
-import { ArrowUpRight, Plus } from "lucide-react";
+import { ArrowUpRight, MessageCircle, Plus } from "lucide-react";
 import { useT } from "@/lib/i18n";
 import { LunaSymbol, LunaWordmark } from "./luna-symbol";
 import { Reveal } from "./reveal";
 import { PartnersEclipse } from "./partners-eclipse";
 import { Magnetic } from "./magnetic";
-import { CountUp } from "./count-up";
 import { CopyEmail } from "./copy-email";
+import { ContactForm } from "./contact-form";
+import { EMAIL, WHATSAPP, whatsappUrl } from "@/lib/contact";
 
 /* ================================================================== */
 /*  Compartilhado: rótulo de seção ("kicker")                          */
 /* ================================================================== */
 /** Pequeno rótulo em mono com um "+" antes — usado no topo de cada seção.
+ *  Exportado porque `sections-sell.tsx` usa o mesmo rótulo; antes havia uma
+ *  segunda cópia lá, com um comentário justificando a duplicação.
  *  Cinzas calibrados para AA em 12px: #6b6b6b (5.1:1 sobre papel) e
  *  #8a8a8a (5.3:1 sobre #141414). */
-function Kicker({ children, dark = false }: { children: React.ReactNode; dark?: boolean }) {
+export function Kicker({ children, dark = false }: { children: React.ReactNode; dark?: boolean }) {
   return (
     <span
       className={`inline-flex items-center gap-2.5 font-mono text-[12px] uppercase tracking-[0.28em] ${
@@ -122,7 +125,8 @@ function MarqueeGroup({ seq }: { seq: readonly string[] }) {
 }
 
 export function TrustBar() {
-  const seq = [...useT().marquee, ...useT().marquee];
+  const { marquee } = useT();
+  const seq = [...marquee, ...marquee];
   return (
     <div aria-hidden className="marquee-mask overflow-hidden border-y border-line bg-paper py-7">
       <div className="marquee-track">
@@ -209,18 +213,6 @@ export function Services() {
 /* ================================================================== */
 /*  About — eclipse interativo + estatísticas inline                   */
 /* ================================================================== */
-/**
- * Estatísticas. Quando `count` existe, o número é animado (CountUp); caso
- * contrário usa-se o texto fixo `n` (ex.: símbolos "01", "∞").
- */
-/** Valores das estatísticas; os rótulos vêm do dicionário, na mesma ordem. */
-const STATS: { n?: string; count?: number; suffix?: string }[] = [
-  { n: "01" },
-  { count: 100, suffix: "%" },
-  { n: "R$" },
-  { n: "+" },
-];
-
 export function About() {
   const t = useT();
   return (
@@ -244,27 +236,20 @@ export function About() {
           <PartnersEclipse />
         </Reveal>
 
-        {/* Estatísticas inline — separadas por filete, sem caixas.
-            <dl> de term/description: cada estatística é um par rótulo (<dt>)
-            + valor (<dd>). As classes de grid/filete migram para o <dl> para
-            o visual ficar idêntico ao layout anterior. */}
+        {/* O que o cliente leva — afirmações, não números.
+            ponytail: aqui havia uma faixa "01 / 100% / R$ / +" em corpo 56px.
+            "R$" e "+" não são métricas; era uma faixa de indicadores sem
+            indicador, justo no site de quem vende dados. Ficaram só as
+            afirmações, que são verdadeiras e já sustentavam a seção. */}
         <Reveal delay={160}>
-          <dl className="mt-20 grid grid-cols-2 divide-x divide-[#2a2a2a] border-t border-[#2a2a2a] md:grid-cols-4">
-            {STATS.map((s, i) => (
-              <div key={t.about.stats[i]} className="px-6 py-8 first:pl-0">
-                <dd className="font-mono text-[clamp(36px,5vw,56px)] font-medium leading-none text-white">
-                  {s.count !== undefined ? (
-                    <CountUp value={s.count} suffix={s.suffix} />
-                  ) : (
-                    s.n
-                  )}
-                </dd>
-                <dt className="mt-3 font-mono text-[12px] uppercase tracking-[0.18em] text-[#888]">
-                  {t.about.stats[i]}
-                </dt>
-              </div>
+          <ul className="mt-20 grid gap-x-10 gap-y-4 border-t border-[#2a2a2a] pt-10 sm:grid-cols-2">
+            {t.about.stats.map((label) => (
+              <li key={label} className="flex items-baseline gap-3 font-mono text-[14px] text-[#ccc]">
+                <span aria-hidden className="mt-[2px] h-[5px] w-[5px] shrink-0 rounded-full bg-ember-bright" />
+                {label}
+              </li>
             ))}
-          </dl>
+          </ul>
         </Reveal>
       </div>
     </section>
@@ -371,17 +356,32 @@ export function FinalCta() {
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <Magnetic strength={0.35}>
               <a
-                href="mailto:contact@lunaco.tech"
+                href={`mailto:${EMAIL}`}
                 className="group inline-flex items-center gap-3 rounded-full border border-[#3a3a3a] py-3.5 pl-7 pr-3.5 font-mono text-[14px] tracking-[0.04em] text-paper transition-colors duration-300 hover:border-paper"
               >
-                contact@lunaco.tech
+                {EMAIL}
                 <span className="flex h-9 w-9 items-center justify-center rounded-full bg-paper text-ink transition-transform duration-300 group-hover:rotate-45">
                   <ArrowUpRight className="h-4 w-4" />
                 </span>
               </a>
             </Magnetic>
-            <CopyEmail email="contact@lunaco.tech" />
+            <CopyEmail email={EMAIL} />
+            {/* WhatsApp: em B2B brasileiro é o canal que o comprador usa no
+                meio do expediente. Só aparece com o número configurado. */}
+            {WHATSAPP && (
+              <a
+                href={whatsappUrl(t.cta.whatsappMessage)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-[#3a3a3a] px-5 py-3 font-mono text-[13px] tracking-[0.04em] text-[#aaa] transition-colors duration-300 hover:border-paper hover:text-paper"
+              >
+                <MessageCircle aria-hidden className="h-4 w-4" />
+                {t.cta.whatsapp}
+              </a>
+            )}
           </div>
+
+          <ContactForm />
         </Reveal>
       </div>
     </section>
@@ -430,11 +430,21 @@ export function SiteFooter() {
                 {t.footer.contactTitle}
               </p>
               <a
-                href="mailto:contact@lunaco.tech"
+                href={`mailto:${EMAIL}`}
                 className="mb-2.5 block text-[#888] transition-colors hover:text-white"
               >
-                contact@lunaco.tech
+                {EMAIL}
               </a>
+              {WHATSAPP && (
+                <a
+                  href={whatsappUrl(t.cta.whatsappMessage)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mb-2.5 block text-[#888] transition-colors hover:text-white"
+                >
+                  {t.cta.whatsapp}
+                </a>
+              )}
               <a href="#top" className="mb-2.5 block text-[#888] transition-colors hover:text-white">
                 lunaco.tech
               </a>
