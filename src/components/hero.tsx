@@ -4,14 +4,14 @@
  * É o lockup oficial em escala máxima: símbolo do eclipse, wordmark "luna&co",
  * uma divisória fina e o slogan. Este é o único lugar onde a identidade é
  * declarada literalmente; tudo abaixo é interpretação. Ocupa a altura total da
- * viewport (`min-h-[100svh]`) com o EclipseField em parallax ao fundo.
+ * viewport abaixo da navegação, com o EclipseField em parallax ao fundo.
  *
  * Cliente por causa do dicionário de idioma (useT); o parallax continua
  * isolado no EclipseField.
  */
 "use client";
 
-import { ArrowDown } from "lucide-react";
+import { ArrowDown, ArrowUpRight } from "lucide-react";
 import { EclipseField } from "./eclipse-field";
 import { LunaSymbol } from "./luna-symbol";
 import { useT } from "@/lib/i18n";
@@ -23,7 +23,7 @@ export function Hero() {
     <section
       id="top"
       aria-label="Hero"
-      className="on-dark relative flex min-h-[100svh] flex-col overflow-hidden bg-dark text-paper"
+      className="on-dark relative flex min-h-[calc(100svh-66px)] flex-col overflow-hidden bg-dark text-paper"
     >
       {/* Estrelas piscando (twinkle) + eclipse com parallax ao fundo */}
       <div className="starfield pointer-events-none absolute inset-0 [animation:twinkle_9s_ease-in-out_infinite]" />
@@ -39,9 +39,9 @@ export function Hero() {
       </span>
 
       {/* Lockup centralizado */}
-      <div className="rail relative z-10 flex flex-1 flex-col items-center justify-center py-28 text-center">
+      <div className="rail relative z-10 flex flex-1 flex-col items-center justify-center py-10 text-center sm:py-14">
         {/* Símbolo do eclipse (animado) */}
-        <div className="mb-10 h-20 w-[150px] animate-fade-up sm:h-24 sm:w-[180px]">
+        <div className="mb-7 h-14 w-[110px] animate-fade-up sm:mb-9 sm:h-20 sm:w-[150px]">
           <LunaSymbol tone="paper" animated />
         </div>
 
@@ -72,17 +72,27 @@ export function Hero() {
         </h1>
 
         {/* Divisória que "cresce" horizontalmente na entrada */}
-        <span className="mt-7 block h-px w-[min(440px,68vw)] origin-center scale-x-0 animate-[grow_0.9s_0.5s_both] bg-paper/30" />
+        <span className="mt-6 block h-px w-[min(440px,68vw)] origin-center scale-x-0 animate-[grow_0.9s_0.5s_both] bg-paper/30" />
 
         {/* Slogan (texto real permitido) */}
-        <p className="mt-7 animate-fade-up font-mono text-[clamp(11px,2.2vw,16px)] uppercase tracking-tagline text-[#bdbdbd] [animation-delay:320ms]">
+        <p className="mt-6 animate-fade-up font-mono text-[clamp(11px,2.2vw,16px)] uppercase tracking-tagline text-[#bdbdbd] [animation-delay:320ms]">
           {t.hero.tagline}
         </p>
+        <p className="mt-6 max-w-[580px] animate-fade-up text-[clamp(15px,2vw,19px)] leading-relaxed text-[#d4d4d4] [animation-delay:420ms]">
+          {t.hero.value}
+        </p>
+        <a
+          href="#contato"
+          className="mt-7 inline-flex animate-fade-up items-center gap-3 rounded-full bg-paper px-6 py-3 font-mono text-[13px] font-medium text-ink transition-transform duration-200 hover:-translate-y-0.5 [animation-delay:520ms]"
+        >
+          {t.nav.cta}
+          <ArrowUpRight aria-hidden className="h-4 w-4" />
+        </a>
       </div>
 
       {/* Indicação de scroll, fixada na base do hero. "00 / NN" = início:
           o SectionHud assume a contagem ao entrar no conteúdo. */}
-      <div className="rail relative z-10 flex items-center justify-between pb-9 font-mono text-[11px] uppercase tracking-[0.3em] text-[#8a8a8a]">
+      <div className="rail relative z-10 flex items-center justify-between pb-6 font-mono text-[11px] uppercase tracking-[0.3em] text-[#8a8a8a]">
         <span className="hidden sm:inline">{t.hero.railLeft}</span>
         <a
           href="#manifesto"

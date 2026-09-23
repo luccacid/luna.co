@@ -29,7 +29,9 @@ export function SiteNav() {
 
   const burgerRef = useRef<HTMLButtonElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLElement>(null);
+  const restoreFocusRef = useRef(true);
 
   // Observa o scroll para alternar a borda da barra.
   useEffect(() => {
@@ -41,34 +43,46 @@ export function SiteNav() {
 
   // Trava a rolagem do fundo (overflow + Lenis) enquanto o menu está aberto.
   useEffect(() => {
-    lockScroll(open);
-    return () => lockScroll(false);
+    if (!open) return;
+    lockScroll("menu", true);
+    return () => lockScroll("menu", false);
   }, [open]);
 
-  // Diálogo acessível: foco entra no botão fechar ao abrir, Escape fecha e
-  // devolve o foco ao hambúrguer. Enquanto aberto, o resto da página fica
-  // `inert` — contém o foco no diálogo sem precisar de focus-trap manual
-  // (WCAG 2.1.2). ponytail: inert nativo cobre todos os browsers atuais.
+  // O menu é modal: o restante da página fica inert e Tab circula no diálogo.
   useEffect(() => {
     if (!open) return;
-    closeBtnRef.current?.focus();
-    const main = document.querySelector("main");
-    // Copia o nó para uma variável local: o cleanup não deve ler navRef.current
-    // (pode ter mudado até lá) — usa a referência capturada na execução do efeito.
-    const nav = navRef.current;
+    const menu = menuRef.current;
+    if (!menu) return;
+    const burger = burgerRef.current;
+    const outside = Array.from(document.body.children)
+      .filter((el) => el !== menu && !el.contains(menu))
+      .map((el) => ({ el: el as HTMLElement, inert: (el as HTMLElement).inert }));
+    outside.forEach(({ el }) => { el.inert = true; });
+    const frame = requestAnimationFrame(() => closeBtnRef.current?.focus());
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setOpen(false);
-        burgerRef.current?.focus();
+      } else if (e.key === "Tab") {
+        const items = Array.from(menu.querySelectorAll<HTMLElement>('a[href], button:not([disabled])'));
+        const first = items[0];
+        const last = items[items.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last?.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first?.focus();
+        }
       }
     };
-    nav?.toggleAttribute("inert", true);
-    main?.toggleAttribute("inert", true);
     window.addEventListener("keydown", onKey);
     return () => {
+      cancelAnimationFrame(frame);
       window.removeEventListener("keydown", onKey);
-      nav?.toggleAttribute("inert", false);
-      main?.toggleAttribute("inert", false);
+      outside.forEach(({ el, inert }) => { el.inert = inert; });
+      if (restoreFocusRef.current) {
+        requestAnimationFrame(() => burger?.focus({ preventScroll: true }));
+      }
     };
   }, [open]);
 
@@ -88,14 +102,14 @@ export function SiteNav() {
           </a>
 
           {/* Links — só desktop. O ponto ember marca a seção ativa. */}
-          <div className="hidden items-center gap-8 font-mono text-[13px] tracking-[0.04em] text-muted-foreground md:flex">
+          <div className="hidden items-center gap-8 font-mono text-[13px] tracking-[0.04em] text-muted-foreground lg:flex">
             {t.nav.links.map((l) => {
               const isActive = active === l.href.slice(1);
               return (
                 <a
                   key={l.href}
                   href={l.href}
-                  aria-current={isActive ? "page" : undefined}
+                  aria-current={isActive ? "location" : undefined}
                   className={cn(
                     "relative transition-colors hover:text-ink",
                     isActive && "text-ink"
@@ -129,11 +143,11 @@ export function SiteNav() {
           <button
             ref={burgerRef}
             type="button"
-            onClick={() => setOpen(true)}
+            onClick={() => { restoreFocusRef.current = true; setOpen(true); }}
             aria-label={t.nav.openMenu}
             aria-expanded={open}
             aria-controls="mobile-menu"
-            className="flex h-10 w-10 items-center justify-center text-ink md:hidden"
+            className="flex h-10 w-10 items-center justify-center text-ink lg:hidden"
           >
             <Menu className="h-5 w-5" />
           </button>
@@ -143,12 +157,13 @@ export function SiteNav() {
 
       {/* Overlay do menu mobile (visibilidade controlada por `open`) */}
       <div
+        ref={menuRef}
         id="mobile-menu"
         role="dialog"
         aria-modal="true"
         aria-label={t.nav.menu}
         className={cn(
-          "on-dark fixed inset-0 z-mobile-menu flex flex-col bg-dark text-paper transition-[opacity,visibility] duration-500 md:hidden",
+          "on-dark fixed inset-0 z-mobile-menu flex flex-col overflow-y-auto overscroll-contain bg-dark text-paper transition-opacity duration-500 lg:hidden",
           open ? "visible opacity-100" : "invisible opacity-0"
         )}
       >
@@ -180,7 +195,11 @@ export function SiteNav() {
             <a
               key={l.href}
               href={l.href}
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                restoreFocusRef.current = false;
+                setOpen(false);
+                requestAnimationFrame(() => document.getElementById(l.href.slice(1))?.focus({ preventScroll: true }));
+              }}
               className={cn(
                 "flex items-baseline justify-between border-b border-[#2a2a2a] py-5 font-mono text-[clamp(34px,11vw,56px)] font-medium tracking-[-0.01em] transition-[transform,opacity] duration-500",
                 open ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
@@ -198,7 +217,11 @@ export function SiteNav() {
           <LangSwitch tone="paper" />
           <a
             href="#contato"
-            onClick={() => setOpen(false)}
+            onClick={() => {
+              restoreFocusRef.current = false;
+              setOpen(false);
+              requestAnimationFrame(() => document.getElementById("contato")?.focus({ preventScroll: true }));
+            }}
             className="inline-flex w-full items-center justify-center rounded-full bg-paper py-4 font-mono text-[14px] tracking-[0.04em] text-ink"
           >
             contact@lunaco.tech

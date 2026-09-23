@@ -5,14 +5,15 @@
  *
  * Uma cortina escura cobre a tela: o símbolo "sobe", uma barra de progresso se
  * preenche e o slogan aparece; em seguida a cortina sobe (translate-y) e revela
- * a página. Roda uma vez por carregamento. Sob `prefers-reduced-motion`, vira
+ * a página. Roda na primeira visita da aba. Sob `prefers-reduced-motion`, vira
  * apenas um piscar curto. O scroll fica travado enquanto a cortina está no ar.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LunaSymbol } from "./luna-symbol";
 import { lockScroll } from "@/lib/scroll-lock";
 
 export function Preloader() {
+  const ref = useRef<HTMLDivElement>(null);
   // `leaving` dispara a animação de saída; `gone` remove o nó da árvore.
   const [leaving, setLeaving] = useState(false);
   const [gone, setGone] = useState(false);
@@ -20,30 +21,51 @@ export function Preloader() {
   useEffect(() => {
     // Visitas subsequentes na mesma aba pulam a intro inteira — ninguém
     // precisa rever 2s de cortina a cada reload.
-    if (sessionStorage.getItem("luna-intro-seen")) {
-      setGone(true);
-      return;
+    let seen = false;
+    try {
+      seen = sessionStorage.getItem("luna-intro-seen") === "1";
+      if (!seen) sessionStorage.setItem("luna-intro-seen", "1");
+    } catch {
+      // A intro continua mesmo se o armazenamento estiver bloqueado.
     }
-    sessionStorage.setItem("luna-intro-seen", "1");
+    if (seen) {
+      const frame = requestAnimationFrame(() => setGone(true));
+      return () => cancelAnimationFrame(frame);
+    }
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    // Tempo que a cortina permanece antes de sair (curto sob reduced-motion).
-    const hold = reduced ? 200 : 1500;
+    const started = Number(document.documentElement.dataset.introStarted);
+    const elapsed = Number.isFinite(started) ? performance.now() - started : 0;
+    const remaining = (ms: number) => Math.max(0, ms - elapsed);
+    const hold = remaining(reduced ? 100 : 1100);
+    const done = remaining(reduced ? 100 : 1700);
 
     // Trava a rolagem (overflow + Lenis) enquanto a intro está visível.
-    lockScroll(true);
+    lockScroll("preloader", true);
+    const overlay = ref.current;
+    const outside = Array.from(document.body.children)
+      .filter((el) => el !== overlay && !el.contains(overlay))
+      .map((el) => ({ el: el as HTMLElement, inert: (el as HTMLElement).inert }));
+    outside.forEach(({ el }) => { el.inert = true; });
+    let released = false;
+    const release = () => {
+      if (released) return;
+      released = true;
+      outside.forEach(({ el, inert }) => { el.inert = inert; });
+      lockScroll("preloader", false);
+    };
 
     const t1 = setTimeout(() => setLeaving(true), hold);
     const t2 = setTimeout(() => {
       setGone(true);
-      lockScroll(false);
-    }, hold + 750); // +750ms = duração da animação de saída
+      release();
+    }, done);
 
     // Limpa timers e restaura o scroll caso desmonte no meio.
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
-      lockScroll(false);
+      release();
     };
   }, []);
 
@@ -52,8 +74,9 @@ export function Preloader() {
 
   return (
     <div
+      ref={ref}
       aria-hidden
-      className={`fixed inset-0 z-preloader flex flex-col items-center justify-center bg-dark transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] ${
+      className={`preloader fixed inset-0 z-preloader flex flex-col items-center justify-center bg-dark transition-[opacity,transform] duration-[600ms] ease-[cubic-bezier(0.76,0,0.24,1)] ${
         leaving ? "pointer-events-none -translate-y-full opacity-0" : "opacity-100"
       }`}
     >
@@ -67,10 +90,10 @@ export function Preloader() {
 
       {/* Barra de progresso que se preenche durante o `hold` */}
       <div className="relative mt-9 h-px w-[180px] overflow-hidden bg-white/12">
-        <span className="absolute inset-y-0 left-0 w-full origin-left animate-[intro-bar_1.5s_ease-out_both] bg-paper/70" />
+        <span className="absolute inset-y-0 left-0 w-full origin-left animate-[intro-bar_1.1s_ease-out_both] bg-paper/70" />
       </div>
 
-      {/* Slogan (um dos dois únicos textos reais do projeto) */}
+      {/* Slogan da marca */}
       <p className="relative mt-5 animate-[fade-up_0.6s_0.3s_both] font-mono text-[10px] uppercase tracking-tagline text-[#8a8a8a]">
         Building Digital Systems
       </p>

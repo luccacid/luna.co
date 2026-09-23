@@ -31,15 +31,15 @@ export function CountUp({
     // Permite re-animar quando `value`/`duration` mudam (deps do efeito).
     done.current = false;
 
-    // Acessibilidade: sem movimento → vai direto ao valor final.
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setN(value);
-      return;
-    }
-
     // Guardamos o id do frame para cancelar no cleanup — sem isso o loop
     // sobrevive ao unmount e chama setState em componente desmontado.
     let rafId = 0;
+
+    // Sem movimento: atualiza no próximo frame e cancela se desmontar antes.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      rafId = requestAnimationFrame(() => setN(value));
+      return () => cancelAnimationFrame(rafId);
+    }
 
     const io = new IntersectionObserver(
       ([entry]) => {

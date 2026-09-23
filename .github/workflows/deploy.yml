@@ -24,7 +24,12 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      - run: npm run lint
       - run: npm run build
+        env:
+          NEXT_PUBLIC_BASE_PATH: /luna.co
+          NEXT_PUBLIC_SITE_URL: https://luccacid.github.io
+      - run: npm run check:export
         env:
           NEXT_PUBLIC_BASE_PATH: /luna.co
           NEXT_PUBLIC_SITE_URL: https://luccacid.github.io

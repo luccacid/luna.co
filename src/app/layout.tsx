@@ -8,54 +8,45 @@
  *   - .grain       → camada de grão (ruído) sobre tudo, para textura
  */
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { Preloader } from "@/components/preloader";
 import { LangProvider } from "@/lib/i18n";
 import { SkipLink } from "@/components/skip-link";
-
-/**
- * Metadados da página. Por requisito do projeto, os únicos textos reais são o
- * nome "luna&co" e o slogan "Building Digital Systems".
- */
-/**
- * Origem canônica do site. Domínio próprio (Hostinger) por padrão; o CI do
- * GitHub Pages sobrescreve via env para manter OG/canonical corretos lá.
- */
-const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://lunaco.tech";
+import { assetUrl, basePath, siteRoot } from "@/lib/site-url";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-  title: "luna&co — Building Digital Systems",
+  metadataBase: siteRoot,
+  title: "luna&co — Sistemas sob medida para operações",
   description:
-    "luna&co — a digital systems studio. Building Digital Systems.",
+    "Sistemas internos, dados e automação para operações que cresceram além da planilha. Escopo e prazo definidos, código no repositório do cliente.",
   // basePath não é aplicado a metadata.icons no export estático — prefixo manual.
   // SVG cobre browsers modernos; .ico = fallback legado; apple-touch = iOS.
   icons: {
     icon: [
-      { url: `${BASE_PATH}/favicon.svg`, type: "image/svg+xml" },
-      { url: `${BASE_PATH}/favicon.ico`, sizes: "32x32" },
+      { url: `${basePath}/favicon.svg`, type: "image/svg+xml" },
+      { url: `${basePath}/favicon.ico`, sizes: "32x32" },
     ],
-    apple: `${BASE_PATH}/apple-touch-icon.png`,
+    apple: `${basePath}/apple-touch-icon.png`,
   },
-  alternates: { canonical: "/" },
+  alternates: { canonical: siteRoot.href },
   openGraph: {
-    title: "luna&co — Building Digital Systems",
-    description: "luna&co — Building Digital Systems.",
+    title: "luna&co — Sistemas sob medida para operações",
+    description: "Sistemas internos, dados e automação para operações que cresceram além da planilha.",
     type: "website",
-    url: "/",
+    url: siteRoot.href,
     siteName: "luna&co",
     images: [
-      { url: "/og.png", width: 1200, height: 630, alt: "luna&co — Building Digital Systems" },
+      { url: assetUrl("og.png"), width: 1200, height: 630, alt: "luna&co — Building Digital Systems" },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "luna&co — Building Digital Systems",
-    description: "luna&co — Building Digital Systems.",
-    images: ["/og.png"],
+    title: "luna&co — Sistemas sob medida para operações",
+    description: "Sistemas internos, dados e automação para operações que cresceram além da planilha.",
+    images: [assetUrl("og.png")],
   },
 };
 
@@ -72,6 +63,20 @@ export const viewport: Viewport = {
   ],
 };
 
+// Trava o scroll antes da hidratação e oculta a intro já vista na mesma aba.
+const introLockScript = `(() => {
+  let seen = false;
+  try { seen = sessionStorage.getItem("luna-intro-seen") === "1"; } catch {}
+  if (seen) {
+    document.documentElement.classList.add("intro-seen");
+  } else {
+    document.documentElement.dataset.introStarted = String(performance.now());
+    document.documentElement.classList.add("intro-pending");
+    setTimeout(() => document.documentElement.classList.remove("intro-pending"),
+      matchMedia("(prefers-reduced-motion: reduce)").matches ? 100 : 1700);
+  }
+})();`;
+
 export default function RootLayout({
   children,
 }: {
@@ -80,8 +85,10 @@ export default function RootLayout({
   return (
     // `lang="pt-BR"` para acessibilidade/leitores de tela.
     // GeistMono.variable injeta --font-geist-mono (consumida em globals.css).
-    <html lang="pt-BR" className={GeistMono.variable}>
+    <html lang="pt-BR" className={GeistMono.variable} suppressHydrationWarning>
       <body className="font-sans">
+        <Script id="intro-lock" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: introLockScript }} />
+        <noscript><style>{".preloader{display:none!important}"}</style></noscript>
         {/* Organization JSON-LD — âncora de entidade/Knowledge Panel. */}
         <script
           type="application/ld+json"
@@ -90,9 +97,9 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "Organization",
               name: "luna&co",
-              url: `${SITE_URL}/`,
-              logo: `${SITE_URL}${BASE_PATH}/favicon.svg`,
-              description: "Building Digital Systems",
+              url: siteRoot.href,
+              logo: assetUrl("favicon.svg"),
+              description: "Sistemas sob medida para operações que cresceram além da planilha.",
             }),
           }}
         />

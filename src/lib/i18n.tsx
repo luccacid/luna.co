@@ -44,6 +44,7 @@ const pt = {
     railLeft: "luna&co — estúdio de software",
     railRight: "sistemas sob medida",
     tagline: "Building Digital Systems",
+    value: "Sistemas sob medida para operações que cresceram além da planilha.",
     scroll: "Rolar",
   },
   statement: {
@@ -257,6 +258,7 @@ const en: Dict = {
     railLeft: "luna&co — software studio",
     railRight: "custom-built systems",
     tagline: "Building Digital Systems",
+    value: "Custom systems for operations that have outgrown spreadsheets.",
     scroll: "Scroll",
   },
   statement: {
@@ -467,6 +469,7 @@ const es: Dict = {
     railLeft: "luna&co — estudio de software",
     railRight: "sistemas a medida",
     tagline: "Building Digital Systems",
+    value: "Sistemas a medida para operaciones que ya superaron la planilla.",
     scroll: "Desplazar",
   },
   statement: {

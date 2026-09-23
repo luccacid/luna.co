@@ -59,13 +59,13 @@ export function Cases() {
                 {/* Desafio e solução lado a lado: a leitura é "de onde" → "para onde" */}
                 <dl className="col-span-12 grid gap-x-10 gap-y-5 md:col-span-8 md:grid-cols-2">
                   <div>
-                    <dt className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#9a9a9a]">
+                    <dt className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#6b6b6b]">
                       {t.cases.challengeLabel}
                     </dt>
                     <dd className="mt-2 text-[15px] text-muted-foreground">{c.challenge}</dd>
                   </div>
                   <div>
-                    <dt className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#9a9a9a]">
+                    <dt className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#6b6b6b]">
                       {t.cases.builtLabel}
                     </dt>
                     <dd className="mt-2 text-[15px] text-ink">{c.built}</dd>

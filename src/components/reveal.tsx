@@ -3,10 +3,8 @@
 /**
  * <Reveal> — revela o conteúdo quando ele entra na viewport (scroll-reveal).
  *
- * O elemento começa invisível/deslocado (classe `.reveal` do globals.css) e
- * recebe `.is-visible` quando o IntersectionObserver detecta a entrada, fazendo
- * o fade + slide para cima. Sob `prefers-reduced-motion`, a classe `.reveal`
- * já neutraliza a animação (o conteúdo aparece direto).
+ * O conteúdo começa visível para sobreviver sem JavaScript. Quando observado,
+ * `.is-visible` aplica a entrada; sob reduced-motion a animação é neutralizada.
  */
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -56,7 +54,7 @@ export function Reveal({
         ref.current = node;
       }}
       className={cn("reveal", shown && "is-visible", className)}
-      style={delay ? { transitionDelay: `${delay}ms` } : undefined}
+      style={delay ? { animationDelay: `${delay}ms` } : undefined}
     >
       {children}
     </Tag>

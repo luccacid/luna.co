@@ -11,7 +11,7 @@
  */
 import { useEffect } from "react";
 import type Lenis from "lenis";
-import { lenisRef } from "@/lib/scroll-lock";
+import { lenisRef, syncScrollLock } from "@/lib/scroll-lock";
 
 export function SmoothScroll() {
   useEffect(() => {
@@ -40,6 +40,7 @@ export function SmoothScroll() {
       });
       // Registra a instância para o lockScroll (menu mobile/preloader).
       lenisRef.current = lenis;
+      syncScrollLock();
 
       // Intercepta cliques em links de âncora para rolar suavemente até a seção.
       onClick = (e: MouseEvent) => {

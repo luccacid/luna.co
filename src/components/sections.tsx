@@ -54,14 +54,14 @@ export function Statement() {
 
         {/* Frase grande, com um trecho cinza que pulsa de opacidade */}
         <Reveal delay={80}>
-          <p className="max-w-[20ch] font-mono text-[clamp(30px,6.5vw,84px)] font-medium leading-[1.04] tracking-[-0.02em] text-ink">
+          <h2 className="max-w-[20ch] font-mono text-[clamp(30px,6.5vw,84px)] font-medium leading-[1.04] tracking-[-0.02em] text-ink">
             {t.statement.lead1}{" "}
             {/* #8a8a8a: 3.3:1 — passa AA para texto grande (o #bcbcbc reprovava) */}
             <span className="text-[#8a8a8a] [animation:pulse-dim_5s_ease-in-out_infinite]">
               {t.statement.leadAccent}
             </span>{" "}
             {t.statement.lead2}
-          </p>
+          </h2>
         </Reveal>
 
         {/* Parágrafo de apoio + link com sublinhado que "varre" no hover */}
@@ -164,11 +164,11 @@ export function Services() {
                 className="group relative block border-b border-line"
               >
                 {/* Camada de tinta que "sobe" preenchendo a linha no hover */}
-                <span className="absolute inset-0 origin-bottom scale-y-0 bg-ink transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-y-100" />
+                <span className="absolute inset-0 origin-bottom scale-y-0 bg-ink transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-y-100 group-focus-visible:scale-y-100" />
 
                 <div className="relative grid grid-cols-12 items-center gap-4 px-1 py-8 md:py-10">
                   {/* Numeração */}
-                  <span className="col-span-2 font-mono text-[13px] text-[#6b6b6b] transition-colors duration-300 group-hover:text-[#888] md:col-span-1">
+                  <span className="col-span-2 font-mono text-[13px] text-[#6b6b6b] transition-colors duration-300 group-hover:text-[#aaa] group-focus-visible:text-[#aaa] md:col-span-1">
                     0{i + 1}
                   </span>
 
@@ -176,14 +176,14 @@ export function Services() {
                       É um <span>, não <h3>: heading dentro de <a> é HTML
                       inválido e inflaria o nome acessível do link — o título
                       vai no aria-label do <a>. */}
-                  <span className="col-span-10 block font-mono text-[clamp(24px,3.4vw,40px)] font-medium tracking-[-0.01em] text-ink transition-all duration-300 group-hover:translate-x-2 group-hover:text-paper md:col-span-5">
+                  <span className="col-span-10 block font-mono text-[clamp(24px,3.4vw,40px)] font-medium tracking-[-0.01em] text-ink transition-all duration-300 group-hover:translate-x-2 group-hover:text-paper group-focus-visible:translate-x-2 group-focus-visible:text-paper md:col-span-5">
                     {s.title}
                   </span>
 
                   {/* Descrição + tags */}
-                  <p className="col-span-9 col-start-3 text-[14px] text-muted-foreground transition-colors duration-300 group-hover:text-[#b3b3b3] md:col-span-4 md:col-start-7">
+                  <p className="col-span-9 col-start-3 text-[14px] text-muted-foreground transition-colors duration-300 group-hover:text-[#b3b3b3] group-focus-visible:text-[#b3b3b3] md:col-span-4 md:col-start-7">
                     {s.body}
-                    <span className="mt-2 block font-mono text-[11px] uppercase tracking-[0.16em] text-[#bbb] transition-colors duration-300 group-hover:text-[#777]">
+                    <span className="mt-2 block font-mono text-[11px] uppercase tracking-[0.16em] text-[#6b6b6b] transition-colors duration-300 group-hover:text-[#b3b3b3] group-focus-visible:text-[#b3b3b3]">
                       {s.tags}
                     </span>
                   </p>
@@ -192,7 +192,7 @@ export function Services() {
                   <span className="col-span-12 hidden justify-end md:col-span-1 md:flex">
                     <ArrowUpRight
                       aria-hidden
-                      className="h-7 w-7 text-ink transition-all duration-300 group-hover:rotate-45 group-hover:text-paper"
+                      className="h-7 w-7 text-ink transition-all duration-300 group-hover:rotate-45 group-hover:text-paper group-focus-visible:rotate-45 group-focus-visible:text-paper"
                       strokeWidth={1.4}
                     />
                   </span>

@@ -54,7 +54,8 @@ em `localStorage`; o HTML pré-renderizado sai em PT.
   headers de segurança e redirect HTTPS/sem-www.
 - **GitHub Pages**: o workflow define `NEXT_PUBLIC_BASE_PATH=/luna.co` e
   `NEXT_PUBLIC_SITE_URL`; sem essas variáveis o build sai pronto para a raiz
-  do domínio próprio.
+  do domínio próprio. Canonical, imagem social, robots e sitemap acompanham
+  o destino de cada build.
 
 ## Animações (jogo de opacidade)
 

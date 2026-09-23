@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://luccacid.github.io/luna.co/sitemap.xml
