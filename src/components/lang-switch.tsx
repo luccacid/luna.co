@@ -71,7 +71,11 @@ export function LangSwitch({
   const dark = tone === "paper";
 
   return (
-    <nav
+    // <div role="group">, não <nav>: este seletor vive dentro da <nav> do
+    // cabeçalho, e um landmark de navegação aninhado em outro atrapalha
+    // quem navega por landmarks.
+    <div
+      role="group"
       aria-label={t.nav.language}
       className={cn(
         "inline-flex items-center rounded-full border p-0.5 font-mono text-[12px] tracking-[0.08em]",
@@ -103,6 +107,6 @@ export function LangSwitch({
           </a>
         );
       })}
-    </nav>
+    </div>
   );
 }

@@ -10,6 +10,7 @@ import type { Lang } from "../langs";
 export const pt = {
   lang: "pt" as Lang,
   htmlLang: "pt-BR",
+  ogLocale: "pt_BR",
   meta: {
     title: "luna&co — Sistemas sob medida para operações",
     description:

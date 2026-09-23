@@ -61,7 +61,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
       type: "website",
       url,
       siteName: "luna&co",
-      locale: t.htmlLang,
+      locale: t.ogLocale,
       images: [{ url: assetUrl("og.png"), width: 1200, height: 630, alt: "luna&co — Building Digital Systems" }],
     },
     twitter: {
@@ -102,7 +102,9 @@ export default async function RootLayout({
 
   return (
     // GeistMono.variable injeta --font-geist-mono (consumida em globals.css).
-    <html lang={dict.htmlLang} className={GeistMono.variable}>
+    // suppressHydrationWarning: `introSeenScript` adiciona uma classe ao
+    // <html> antes da hidratação — divergência esperada, não erro.
+    <html lang={dict.htmlLang} className={GeistMono.variable} suppressHydrationWarning>
       <body className="font-sans">
         <Script id="intro-seen" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: introSeenScript }} />
         <noscript><style>{".preloader{display:none!important}"}</style></noscript>

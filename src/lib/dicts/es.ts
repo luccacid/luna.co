@@ -5,6 +5,7 @@ import type { Dict } from "./pt";
 export const es: Dict = {
   lang: "es" as Lang,
   htmlLang: "es",
+  ogLocale: "es_ES",
   meta: {
     title: "luna&co — Sistemas a medida para operaciones",
     description:

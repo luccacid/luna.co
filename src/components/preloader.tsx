@@ -38,8 +38,12 @@ export function Preloader() {
     }
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const hold = reduced ? 80 : 320;
-    const done = reduced ? 100 : 600;
+    // Os prazos contam da NAVEGAÇÃO (performance.now()), não da hidratação:
+    // em conexão lenta o JS chega tarde e um timer relativo à montagem
+    // devolveria a cortina de 1,7s pela porta dos fundos. 600ms é teto.
+    const since = performance.now();
+    const hold = Math.max(0, (reduced ? 80 : 320) - since);
+    const done = Math.max(0, (reduced ? 100 : 600) - since);
 
     // Trava a rolagem (overflow + Lenis) enquanto a intro está visível.
     lockScroll("preloader", true);
