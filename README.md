@@ -121,7 +121,15 @@ sobrescreve `public/_headers` e falha procurando `.next/standalone`, que
 | Root directory | (vazio) |
 
 O que publicar (`out/`), o 404 e o trailing slash vêm do `wrangler.jsonc`, não
-do painel. Para conferir sem publicar: `npx wrangler deploy --dry-run`.
+do painel. Para conferir sem publicar: `npx wrangler deploy --dry-run` — mas
+ele não valida `_headers`, que só é conferido no servidor, ao publicar.
+
+**www → apex**: em Workers static assets o `_redirects` só aceita caminho
+relativo, então um redirect entre hosts não cabe ali. Depois de adicionar o
+domínio, crie em **Rules → Redirect Rules** da zona: se *Hostname* igual a
+`www.lunaco.tech`, redirecionar 301 para
+`concat("https://lunaco.tech", http.request.uri.path)`. No Apache quem faz
+isso continua sendo o `.htaccess`.
 
 Variáveis de ambiente do projeto: `NEXT_PUBLIC_SITE_URL=https://lunaco.tech` e,
 opcionalmente, `NEXT_PUBLIC_WHATSAPP`, `NEXT_PUBLIC_FORM_ENDPOINT` e

@@ -1,2 +1,0 @@
-# www → domínio sem www (o .htaccess faz isso no Apache; aqui é este arquivo).
-https://www.lunaco.tech/* https://lunaco.tech/:splat 301!

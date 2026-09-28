@@ -6,8 +6,8 @@
  * - images.unoptimized: não há otimizador do Next em host estático.
  *
  * ponytail: headers() continua fora — com output:"export" quem serve headers
- * é o host. Apache/Hostinger lê public/.htaccess; Cloudflare Pages lê
- * public/_headers e public/_redirects. Os três descrevem a mesma política.
+ * é o host. Apache/Hostinger lê public/.htaccess; Cloudflare Workers lê
+ * public/_headers (o redirect www → apex lá é Redirect Rule, não arquivo).
  */
 import type { NextConfig } from "next";
 

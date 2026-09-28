@@ -1,6 +1,10 @@
-# Cloudflare Pages — equivalente ao que o .htaccess faz no Apache.
-# A Cloudflare ignora .htaccess; sem este arquivo os headers de segurança
-# sumiriam em silêncio ao migrar de host.
+# Cloudflare Workers (static assets) — equivalente ao que o .htaccess faz no
+# Apache. A Cloudflare ignora .htaccess; sem este arquivo os headers de
+# segurança sumiriam em silêncio ao migrar de host.
+#
+# O par _redirects NÃO existe aqui: em Workers static assets ele só aceita
+# caminho relativo, e o único redirect que precisávamos (www → apex) é
+# cross-host. Esse fica como Redirect Rule no painel da zona — ver README.
 
 /*
   X-Content-Type-Options: nosniff
