@@ -106,14 +106,22 @@ ou sitemap apontando para o host errado — sem nenhum erro de build.
   do domínio próprio. Canonical, imagem social, robots e sitemap acompanham
   o destino de cada build.
 
-### Configuração na Cloudflare Pages
+### Configuração na Cloudflare
+
+O projeto sobe como **Worker de assets estáticos**. O `wrangler.jsonc` na raiz
+é o que impede o wrangler de detectar "Next.js", assumir SSR e rodar
+`@opennextjs/cloudflare migrate` sozinho — o que reescreve `next.config.ts`,
+sobrescreve `public/_headers` e falha procurando `.next/standalone`, que
+`output: "export"` nunca gera.
 
 | Campo | Valor |
 |---|---|
-| Framework preset | None |
 | Build command | `npm run build` |
-| Build output directory | `out` |
+| Deploy command | `npx wrangler deploy` |
 | Root directory | (vazio) |
+
+O que publicar (`out/`), o 404 e o trailing slash vêm do `wrangler.jsonc`, não
+do painel. Para conferir sem publicar: `npx wrangler deploy --dry-run`.
 
 Variáveis de ambiente do projeto: `NEXT_PUBLIC_SITE_URL=https://lunaco.tech` e,
 opcionalmente, `NEXT_PUBLIC_WHATSAPP`, `NEXT_PUBLIC_FORM_ENDPOINT` e

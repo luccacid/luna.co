@@ -1,0 +1,23 @@
+/**
+ * Cloudflare Workers — site estático (assets-only, sem entrypoint `main`).
+ *
+ * Este arquivo existe para o wrangler NÃO adivinhar. Sem ele, o deploy detecta
+ * "Next.js", assume SSR e roda `@opennextjs/cloudflare migrate` sozinho em modo
+ * não-interativo: reescreve next.config.ts, sobrescreve public/_headers e
+ * quebra procurando .next/standalone — que `output: "export"` nunca gera.
+ *
+ * O build continua sendo `npm run build`; aqui só dizemos o que publicar.
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "site",
+  "compatibility_date": "2026-09-28",
+  "assets": {
+    // Saída do `next build` com output: "export".
+    "directory": "./out",
+    // Serve o 404.html do próprio site em vez da página genérica da Cloudflare.
+    "not_found_handling": "404-page",
+    // Casa com `trailingSlash: true` do next.config: /en → /en/ → /en/index.html.
+    "html_handling": "force-trailing-slash"
+  }
+}
