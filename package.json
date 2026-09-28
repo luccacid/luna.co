@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "prebuild": "node -e \"require('fs').rmSync('out',{recursive:true,force:true})\"",
     "build": "next build",
     "check:export": "node scripts/check-export.mjs",
     "start": "next start",
