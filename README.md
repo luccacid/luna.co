@@ -97,10 +97,28 @@ ou sitemap apontando para o host errado — sem nenhum erro de build.
   `FTP_PASSWORD`. Enquanto isso, o caminho manual continua: `npm run build` e
   suba o conteúdo de `out/`. O `.htaccess` (de `public/`) cuida de 404, cache,
   gzip, headers de segurança e redirect HTTPS/sem-www.
+- **Cloudflare Pages (lunaco.tech)**: conecta no repositório e roda
+  `npm run build`, publicando `out/`. Headers de segurança e o redirect
+  www → apex vêm de `public/_headers` e `public/_redirects` (a Cloudflare
+  ignora `.htaccess`); a versão do Node vem de `.node-version`.
 - **GitHub Pages**: o workflow define `NEXT_PUBLIC_BASE_PATH=/luna.co` e
   `NEXT_PUBLIC_SITE_URL`; sem essas variáveis o build sai pronto para a raiz
   do domínio próprio. Canonical, imagem social, robots e sitemap acompanham
   o destino de cada build.
+
+### Configuração na Cloudflare Pages
+
+| Campo | Valor |
+|---|---|
+| Framework preset | None |
+| Build command | `npm run build` |
+| Build output directory | `out` |
+| Root directory | (vazio) |
+
+Variáveis de ambiente do projeto: `NEXT_PUBLIC_SITE_URL=https://lunaco.tech` e,
+opcionalmente, `NEXT_PUBLIC_WHATSAPP`, `NEXT_PUBLIC_FORM_ENDPOINT` e
+`NEXT_PUBLIC_ANALYTICS_DOMAIN`. **Não** defina `NEXT_PUBLIC_BASE_PATH` — ele é
+só do GitHub Pages.
 
 ## Animações (jogo de opacidade)
 
