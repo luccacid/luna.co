@@ -86,9 +86,21 @@ export const viewport: Viewport = {
   ],
 };
 
-// Só marca "a intro já rodou nesta aba" antes da hidratação, para quem recarrega
-// não ver a cortina piscar. Não trava scroll e não depende de timer.
-const introSeenScript = `try{if(sessionStorage.getItem("luna-intro-seen")==="1")document.documentElement.classList.add("intro-seen")}catch{}`;
+// Roda antes da primeira pintura:
+//  - "intro-seen": quem recarrega não vê a cortina piscar;
+//  - "js": libera o estado inicial escondido do scroll-reveal. Sem JS a
+//    classe nunca entra e o conteúdo fica visível, como antes.
+//
+// A rede de segurança no load cobre o caso de o JavaScript existir mas o
+// bundle falhar (bloqueador, rede): sem `data-hydrated` — marcado pelo
+// <Reveal> ao montar — o React não rodou, então tira o "js" e tudo aparece.
+//
+// O sinal tem de ser hidratação, não "algum bloco já foi revelado": o Hero
+// ocupa a tela inteira, nenhum Reveal está à vista no carregamento, e a
+// checagem ingênua desarmava o efeito em toda visita.
+const bootScript = `try{if(sessionStorage.getItem("luna-intro-seen")==="1")document.documentElement.classList.add("intro-seen")}catch{}
+document.documentElement.classList.add("js");
+addEventListener("load",function(){setTimeout(function(){if(!document.documentElement.dataset.hydrated)document.documentElement.classList.remove("js")},2000)});`;
 
 export default async function RootLayout({
   children,
@@ -106,7 +118,7 @@ export default async function RootLayout({
     // <html> antes da hidratação — divergência esperada, não erro.
     <html lang={dict.htmlLang} className={GeistMono.variable} suppressHydrationWarning>
       <body className="font-sans">
-        <Script id="intro-seen" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: introSeenScript }} />
+        <Script id="boot" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: bootScript }} />
         <noscript><style>{".preloader{display:none!important}"}</style></noscript>
         {/* Organization JSON-LD — âncora de entidade/Knowledge Panel. */}
         <script

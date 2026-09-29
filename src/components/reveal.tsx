@@ -26,6 +26,10 @@ export function Reveal({
   const [shown, setShown] = useState(false);
 
   useEffect(() => {
+    // Sinal de hidratação para o script de boot: se nenhum Reveal montou, o
+    // bundle não rodou e a rede de segurança lá devolve o conteúdo à vista.
+    document.documentElement.dataset.hydrated = "1";
+
     const el = ref.current;
     if (!el) return;
 

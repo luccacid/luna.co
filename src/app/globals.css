@@ -154,7 +154,18 @@
       radial-gradient(1.5px 1.5px at 70% 48%, rgba(255, 255, 255, 0.08), transparent);
   }
 
-  /* Conteúdo legível sem JS; o observer aciona a entrada quando disponível. */
+  /* Estado inicial do scroll-reveal.
+     Fica atrás de `html.js` — classe posta pelo script pré-hidratação, antes
+     da primeira pintura — para que sem JavaScript o conteúdo continue
+     visível. Sem esse gate o bloco nascia opaco e a animação o levava de
+     volta a `opacity: 0` ao entrar na tela: ele aparecia, sumia e voltava.
+     O observer só dispara com 15% do elemento à vista, então o pisca
+     acontecia já com o bloco visível. */
+  html.js .reveal:not(.is-visible) {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
   .reveal.is-visible {
     animation: reveal-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
